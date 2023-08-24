@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch android development",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "Launch web devlopment",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "args": ["-d" , "chrome" , "--web-browser-flag" , "--disable-web-security"]
+        }
+    ]
+}
