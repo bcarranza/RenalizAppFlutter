@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:renalizapp/features/home/presentation/widgets/main_list.dart';
 
 class HomeScreen extends StatelessWidget {
   /// Creates a RootScreen
@@ -19,18 +20,7 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Renalizapp'),
       ),
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text('Estoy en home',
-                style: Theme.of(context).textTheme.titleLarge),
-            const Padding(padding: EdgeInsets.all(4)),
-           TextButton(
-              onPressed: () => context.go(subPath),
-              child: const Text('Moverse a ruta hija'),
-            ),
-          ],
-        ),
+        child: MainList()
       ),
     );
   }
