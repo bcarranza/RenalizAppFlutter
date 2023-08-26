@@ -2,42 +2,31 @@ import 'package:flutter/material.dart';
 
 import '../destinations.dart';
 
-class NavBar extends StatefulWidget {
-  final int initialIndex;
- const NavBar({Key? key, required this.initialIndex}) : super(key: key);
-
-
-  @override
-  _NavBarState createState() => _NavBarState();
-}
-
-class _NavBarState extends State<NavBar> {
-
-  int selectedIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedIndex = widget.initialIndex;
-  }
+class ScaffoldWithNavigationBar extends StatelessWidget {
+  const ScaffoldWithNavigationBar({
+    super.key,
+    required this.body,
+    required this.selectedIndex,
+    required this.onDestinationSelected,
+  });
+  final Widget body;
+  final int selectedIndex;
+  final ValueChanged<int> onDestinationSelected;
 
   @override
   Widget build(BuildContext context) {
-    return  NavigationBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        destinations: destinations.map<NavigationDestination>((d) {
-          return NavigationDestination(
-            icon: Icon(d.icon),
-            label: d.label,
-          );
-        }).toList(),
+    return Scaffold(
+      body: body,
+      bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
-      );
+        destinations: destinations.map<NavigationDestination>((d) {
+        return NavigationDestination(
+          icon: Icon(d.icon),
+          label: d.label,
+        );
+      }).toList(),
+        onDestinationSelected: onDestinationSelected,
+      ),
+    );
   }
 }
