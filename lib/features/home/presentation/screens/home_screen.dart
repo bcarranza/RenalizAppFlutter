@@ -1,59 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:renalizapp/features/shared/shared.dart';
-class HomeScreen extends StatefulWidget {
+import 'package:go_router/go_router.dart';
 
-  static const String name = 'home_screen';
+class HomeScreen extends StatelessWidget {
+  /// Creates a RootScreen
+  const HomeScreen({ required this.subPath, Key? key})
+      : super(key: key);
 
-const HomeScreen({ Key? key }) : super(key: key);
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-
-  int selectedIndex = 1;
+  /// The label
 
 
-  bool wideScreen = false;
+  /// The path to the detail page
+  final String subPath;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final double width = MediaQuery.of(context).size.width;
-    wideScreen = width > 600;
-  }
-
-  @override
-  Widget build(BuildContext context){
-    final colorScheme = Theme.of(context).colorScheme;
-    return  Scaffold(
-        body: Row(
-          children: [
-            if (wideScreen)
-            DisappearingNavigationDrawer(
-              selectedIndex: selectedIndex,
-              backgroundColor: colorScheme.tertiaryContainer,
-              onDestinationSelected: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Renalizapp'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text('Estoy en home',
+                style: Theme.of(context).textTheme.titleLarge),
+            const Padding(padding: EdgeInsets.all(4)),
+           TextButton(
+              onPressed: () => context.go(subPath),
+              child: const Text('Moverse a ruta hija'),
             ),
           ],
-          ),
-          bottomNavigationBar: wideScreen
-          ? null
-          : DisappearingBottomNavigationBar(
-              selectedIndex: selectedIndex,
-              onDestinationSelected: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
-            ),
-          
-      );
+        ),
+      ),
+    );
   }
 }
