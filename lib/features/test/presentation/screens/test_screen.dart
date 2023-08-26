@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class HomeScreen extends StatelessWidget {
+class TestScreen extends StatelessWidget {
   /// Creates a RootScreen
-  const HomeScreen({ required this.subPath, Key? key})
+  const TestScreen({ required this.subPath, Key? key})
       : super(key: key);
 
   /// The label
@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Text('Estoy en home',
+            Text('Estoy en test',
                 style: Theme.of(context).textTheme.titleLarge),
             const Padding(padding: EdgeInsets.all(4)),
            TextButton(
