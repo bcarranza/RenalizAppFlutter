@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Renalizapp'),
       ),
       body: Center(
-        child: MainList(),
+        child: MainList()
       ),
     );
   }
