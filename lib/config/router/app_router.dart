@@ -1,10 +1,11 @@
 
 
-import 'package:flutter/cupertino.dart';
+
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:renalizapp/features/chat/screens/chat_screen.dart';
+import 'package:renalizapp/features/chat/chat.dart';
 import 'package:renalizapp/features/home/home.dart';
-import 'package:renalizapp/features/test/screens/test_screen.dart';
+import 'package:renalizapp/features/test/test.dart';
 
 import '../../features/shared/widgets/scaffold_with_nested_navigation/scaffold_nested.dart';
 
