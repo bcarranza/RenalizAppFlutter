@@ -78,8 +78,7 @@ lib/generated_plugin_registrant.dart
 .history
 .ionide
 
-###Environment
-.env
+
 
 
 # End of https://www.toptal.com/developers/gitignore/api/flutter,visualstudiocode
