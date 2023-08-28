@@ -20,11 +20,11 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         destinations: destinations.map<NavigationDestination>((d) {
-        return NavigationDestination(
-          icon: Icon(d.icon),
-          label: d.label,
-        );
-      }).toList(),
+          return NavigationDestination(
+            icon: Icon(d.icon),
+            label: d.label,
+          );
+        }).toList(),
         onDestinationSelected: onDestinationSelected,
       ),
     );

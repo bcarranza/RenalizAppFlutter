@@ -22,7 +22,7 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
             selectedIndex: selectedIndex,
             onDestinationSelected: onDestinationSelected,
             labelType: NavigationRailLabelType.all,
-             destinations: destinations.map((destination) {
+            destinations: destinations.map((destination) {
               return NavigationRailDestination(
                 label: Text(destination.label),
                 icon: Icon(destination.icon),
