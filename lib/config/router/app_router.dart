@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:renalizapp/features/chat/chat.dart';
 import 'package:renalizapp/features/home/home.dart';
+import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
 import 'package:renalizapp/features/test/test.dart';
 
 import '../../features/shared/widgets/scaffold_with_nested_navigation/scaffold_nested.dart';
@@ -35,10 +36,17 @@ final appRouter =
         //Test branch
         StatefulShellBranch(navigatorKey: _shellNavigatorTestKey, routes: [
           GoRoute(
-            path: '/test',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: TestScreen(subPath: '/test/1')),
-          )
+              path: '/test',
+              pageBuilder: (context, state) => const NoTransitionPage(
+                      child: TestScreen(
+                    subPath: '/test/patient-form',
+                  )),
+              routes: [
+                GoRoute(
+                  path: 'patient-form',
+                  builder: (context, state) => PatientForm(),
+                )
+              ]),
         ]),
 
         //Chat branch
@@ -48,6 +56,6 @@ final appRouter =
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: ChatScreen(subPath: '/chat/1')),
           )
-        ])
+        ]),
       ])
 ]);

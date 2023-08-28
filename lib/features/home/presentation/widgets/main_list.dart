@@ -31,26 +31,29 @@ class _MainListState extends State<MainList> {
       },
     ];
 
-    return StatefulBuilder(builder: (context, setState) => ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              leading: Image.network(items[index]["imageUrl"]),
-              title: Text(items[index]["title"]),
-              subtitle: Text(items[index]["description"]),
-              trailing: IconButton(
-                icon: Icon(
-                  items[index]["isStarred"] ? Icons.star : Icons.star_border,
-                  color: Colors.orange,
-                ),
-                onPressed: () {
-                  setState(() {
-                    items[index]["isStarred"] = !items[index]["isStarred"];
-                  });
-                },
-              ),
-            );
-          },
-        ));
+    return StatefulBuilder(
+        builder: (context, setState) => ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: Image.network(items[index]["imageUrl"]),
+                  title: Text(items[index]["title"]),
+                  subtitle: Text(items[index]["description"]),
+                  trailing: IconButton(
+                    icon: Icon(
+                      items[index]["isStarred"]
+                          ? Icons.star
+                          : Icons.star_border,
+                      color: Colors.orange,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        items[index]["isStarred"] = !items[index]["isStarred"];
+                      });
+                    },
+                  ),
+                );
+              },
+            ));
   }
 }
