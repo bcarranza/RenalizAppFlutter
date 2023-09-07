@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:renalizapp/features/chat/chat.dart';
 import 'package:renalizapp/features/home/home.dart';
+import 'package:renalizapp/features/test/presentation/screens/login_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
+import 'package:renalizapp/features/test/presentation/screens/perfil_file.dart';
 import 'package:renalizapp/features/test/test.dart';
 
 import '../../features/shared/widgets/scaffold_with_nested_navigation/scaffold_nested.dart';
@@ -33,21 +35,33 @@ final appRouter =
           )
         ]),
 
-        //Test branch
-        StatefulShellBranch(navigatorKey: _shellNavigatorTestKey, routes: [
-          GoRoute(
+        StatefulShellBranch(
+          navigatorKey: _shellNavigatorTestKey,
+          routes: [
+            GoRoute(
               path: '/test',
               pageBuilder: (context, state) => const NoTransitionPage(
-                      child: TestScreen(
-                    subPath: '/test/patient-form',
-                  )),
+                child: TestScreen(
+                  subPath: '/test/patient-form',
+                ),
+              ),
               routes: [
                 GoRoute(
                   path: 'patient-form',
                   builder: (context, state) => PatientForm(),
-                )
-              ]),
-        ]),
+                ),
+                GoRoute(
+                  path: 'patient-file', // Ruta existente
+                  builder: (context, state) => PerfilFile(),
+                ),
+                GoRoute(
+                  path: 'login', // Agrega una nueva ruta para LoginScreen
+                  builder: (context, state) => LoginScreen(),
+                ),
+              ],
+            ),
+          ],
+        ),
 
         //Chat branch
         StatefulShellBranch(navigatorKey: _shellNavigatorChattKey, routes: [

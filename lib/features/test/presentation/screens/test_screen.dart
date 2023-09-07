@@ -46,6 +46,14 @@ class TestScreen extends StatelessWidget {
                 child: Text('Registrarse'),
               ),
               const SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  // Redirige a la subruta de inicio de sesión
+                  context.go('/test/login');
+                },
+                child: Text(
+                    '¿Ya tienes una cuenta? Iniciar sesión'), // Cambia el texto según tus necesidades
+              )
             ],
           ),
         ),
