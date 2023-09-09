@@ -12,6 +12,7 @@
 .pub-cache/
 .pub/
 build/
+pubspec.lock
 coverage/
 lib/generated_plugin_registrant.dart
 # For library packages, don’t commit the pubspec.lock file.
