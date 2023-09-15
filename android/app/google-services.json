@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "150217668394",
+    "project_id": "renalizapp-dev-2023-396503",
+    "storage_bucket": "renalizapp-dev-2023-396503.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150217668394:android:30f8714fb78e1280d41053",
+        "android_client_info": {
+          "package_name": "app.dportillo.renalizapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "150217668394-eqsb8rofukteg52tt05sgva381h1a4sf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.dportillo.renalizapp",
+            "certificate_hash": "98d714c01514bfb8388d5c69d9b0ddbd8017e350"
+          }
+        },
+        {
+          "client_id": "150217668394-6s05qjtj3rli7ksgsdm14nggbe93nfcp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv5ZSvpGlCw5KhMF4U2oBd2RSGIVSA2-k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "150217668394-6s05qjtj3rli7ksgsdm14nggbe93nfcp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "150217668394-4fflv4t4kpo7mj8jrqphne5vc769emmv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "app.dportillo.renalizapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
