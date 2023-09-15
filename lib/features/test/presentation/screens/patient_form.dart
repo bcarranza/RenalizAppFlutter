@@ -15,6 +15,12 @@ class _PatientFormState extends State<PatientForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn(
+    clientId:
+        '150217668394-6s05qjtj3rli7ksgsdm14nggbe93nfcp.apps.googleusercontent.com',
+  );
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = (await showDatePicker(
       context: context,
@@ -31,29 +37,41 @@ class _PatientFormState extends State<PatientForm> {
     }
   }
 
-// Agrega la función signInWithGoogle aquí
-  Future<UserCredential> signInWithGoogle() async {
+  Future<void> _signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleSignInAccount =
-          await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount!.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
-
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-
-      // Utiliza el contexto para redirigir al usuario
-      Navigator.of(context).pushNamed('/test/patient-file');
-
-      return userCredential;
+          await googleSignIn.signIn();
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleSignInAuthentication.idToken,
+          accessToken: googleSignInAuthentication.accessToken,
+        );
+        final UserCredential authResult =
+            await _auth.signInWithCredential(credential);
+        final User? user = authResult.user;
+        if (user != null) {
+          // El usuario se ha registrado con Google correctamente
+          _navigatorKey.currentState!.pushNamed('/test/patient-file');
+        }
+      }
     } catch (error) {
-      print('Error al iniciar sesión con Google: $error');
-      throw error;
+      print(error);
+    }
+  }
+
+  Future<void> _signOut() async {
+    try {
+      // Cerrar sesión con Firebase
+      await _auth.signOut();
+
+      // Cerrar sesión con Google
+      await googleSignIn.signOut();
+
+      print("Sesión cerrada exitosamente");
+    } catch (error) {
+      print("Error al cerrar sesión: $error");
     }
   }
 
@@ -65,6 +83,12 @@ class _PatientFormState extends State<PatientForm> {
         title: Text('Registro de Paciente'),
         backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: _signOut,
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -145,7 +169,9 @@ class _PatientFormState extends State<PatientForm> {
                 ),
                 SizedBox(height: 20),
                 GoogleAuthButton(
-                  onPressed: signInWithGoogle,
+                  onPressed: () async {
+                    await _signInWithGoogle();
+                  },
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
@@ -160,7 +186,7 @@ class _PatientFormState extends State<PatientForm> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text('Registrarse'),
+                  child: Text('Guardar datos'),
                 ),
               ],
             ),
