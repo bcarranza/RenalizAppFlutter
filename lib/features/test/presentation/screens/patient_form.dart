@@ -64,10 +64,7 @@ class _PatientFormState extends State<PatientForm> {
   Future<void> _signOut() async {
     try {
       // Cerrar sesión con Firebase
-      await _auth.signOut();
-
-      // Cerrar sesión con Google
-      await googleSignIn.signOut();
+      await FirebaseAuth.instance.signOut();
 
       print("Sesión cerrada exitosamente");
     } catch (error) {

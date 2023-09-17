@@ -45,17 +45,17 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyAypsjGbLvWfccG-45jZ1AyKNSEhUa5qgc',
-    appId: '1:150217668394:web:96acfef1e6ce6a53d41053',
+    appId: '1:150217668394:web:ea872452d74cc932d41053',
     messagingSenderId: '150217668394',
     projectId: 'renalizapp-dev-2023-396503',
     authDomain: 'renalizapp-dev-2023-396503.firebaseapp.com',
     storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
-    measurementId: 'G-BK6NYTG137',
+    measurementId: 'G-RB3TRCTHQ8',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCv5ZSvpGlCw5KhMF4U2oBd2RSGIVSA2-k',
-    appId: '1:150217668394:android:30f8714fb78e1280d41053',
+    appId: '1:150217668394:android:3b978352699ba020d41053',
     messagingSenderId: '150217668394',
     projectId: 'renalizapp-dev-2023-396503',
     storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
@@ -63,20 +63,22 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAqrgyimEXPoys_Ec2iB0jhQeesz8_5D9M',
-    appId: '1:150217668394:ios:b6d6648d3648b131d41053',
+    appId: '1:150217668394:ios:7e7ab4a10cc62a89d41053',
     messagingSenderId: '150217668394',
     projectId: 'renalizapp-dev-2023-396503',
     storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
+    androidClientId: '150217668394-eqsb8rofukteg52tt05sgva381h1a4sf.apps.googleusercontent.com',
     iosClientId: '150217668394-4fflv4t4kpo7mj8jrqphne5vc769emmv.apps.googleusercontent.com',
     iosBundleId: 'app.dportillo.renalizapp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAqrgyimEXPoys_Ec2iB0jhQeesz8_5D9M',
-    appId: '1:150217668394:ios:3c9128d224e71f9ad41053',
+    appId: '1:150217668394:ios:29569c2126407b21d41053',
     messagingSenderId: '150217668394',
     projectId: 'renalizapp-dev-2023-396503',
     storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
+    androidClientId: '150217668394-eqsb8rofukteg52tt05sgva381h1a4sf.apps.googleusercontent.com',
     iosClientId: '150217668394-8ifqtbq43c2sscemt3h3jn8e62f5gaup.apps.googleusercontent.com',
     iosBundleId: 'app.dportillo.renalizapp.RunnerTests',
   );
