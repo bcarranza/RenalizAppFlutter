@@ -29,7 +29,8 @@ class TestScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  context.go(subPath);
+                  // context.go(subPath);
+                  context.go('/test/login');
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -37,7 +38,7 @@ class TestScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text('Registrarse'),
+                child: Text('¡Únete ahora!'),
               ),
               const SizedBox(height: 10),
               ElevatedButton(
