@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:auth_buttons/auth_buttons.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:go_router/go_router.dart';
 
 class PatientForm extends StatefulWidget {
+  final GoRouter appRouter; // Agrega una propiedad para almacenar el enrutador
+
+  PatientForm({required this.appRouter});
   @override
   _PatientFormState createState() => _PatientFormState();
 }
@@ -14,12 +14,6 @@ class _PatientFormState extends State<PatientForm> {
   DateTime? selectedDate;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn(
-    clientId:
-        '150217668394-6s05qjtj3rli7ksgsdm14nggbe93nfcp.apps.googleusercontent.com',
-  );
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = (await showDatePicker(
@@ -37,41 +31,6 @@ class _PatientFormState extends State<PatientForm> {
     }
   }
 
-  Future<void> _signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleSignInAccount =
-          await googleSignIn.signIn();
-      if (googleSignInAccount != null) {
-        final GoogleSignInAuthentication googleSignInAuthentication =
-            await googleSignInAccount.authentication;
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          idToken: googleSignInAuthentication.idToken,
-          accessToken: googleSignInAuthentication.accessToken,
-        );
-        final UserCredential authResult =
-            await _auth.signInWithCredential(credential);
-        final User? user = authResult.user;
-        if (user != null) {
-          // El usuario se ha registrado con Google correctamente
-          _navigatorKey.currentState!.pushNamed('/test/patient-file');
-        }
-      }
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  Future<void> _signOut() async {
-    try {
-      // Cerrar sesión con Firebase
-      await FirebaseAuth.instance.signOut();
-
-      print("Sesión cerrada exitosamente");
-    } catch (error) {
-      print("Error al cerrar sesión: $error");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -80,12 +39,6 @@ class _PatientFormState extends State<PatientForm> {
         title: Text('Registro de Paciente'),
         backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: _signOut,
-          ),
-        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -110,24 +63,6 @@ class _PatientFormState extends State<PatientForm> {
                         }
                         return null;
                       }),
-                      _buildTextField('Correo', (value) {
-                        if (value!.isEmpty) {
-                          return 'Ingrese el correo';
-                        }
-                        if (!_isValidEmail(value)) {
-                          return 'Ingrese un correo válido';
-                        }
-                        return null;
-                      }),
-                      _buildTextField('Contraseña', (value) {
-                        if (value!.isEmpty) {
-                          return 'Ingrese la contraseña';
-                        }
-                        if (value.length < 6) {
-                          return 'La contraseña debe tener al menos 6 caracteres';
-                        }
-                        return null;
-                      }, isPassword: true),
                       SizedBox(height: 5),
                       InkWell(
                         onTap: () => _selectDate(context),
@@ -165,16 +100,10 @@ class _PatientFormState extends State<PatientForm> {
                   ),
                 ),
                 SizedBox(height: 20),
-                GoogleAuthButton(
-                  onPressed: () async {
-                    await _signInWithGoogle();
-                  },
-                ),
-                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Perform form submission
+                      context.go('/profile');
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -183,7 +112,7 @@ class _PatientFormState extends State<PatientForm> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text('Guardar datos'),
+                  child: Text('Completar perfil'),
                 ),
               ],
             ),
@@ -193,14 +122,12 @@ class _PatientFormState extends State<PatientForm> {
     );
   }
 
-  Widget _buildTextField(String labelText, String? Function(String?)? validator,
-      {bool isPassword = false}) {
+  Widget _buildTextField(
+      String labelText, String? Function(String?)? validator) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: TextFormField(
         validator: validator,
-        obscureText:
-            isPassword, // Utiliza obscureText para ocultar la contraseña
         style: TextStyle(
           fontSize: 16,
           fontFamily: 'Nunito',
@@ -216,10 +143,5 @@ class _PatientFormState extends State<PatientForm> {
         ),
       ),
     );
-  }
-
-  bool _isValidEmail(String email) {
-    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
-    return emailRegExp.hasMatch(email);
   }
 }

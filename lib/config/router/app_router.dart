@@ -48,17 +48,20 @@ final appRouter =
               routes: [
                 GoRoute(
                   path: 'patient-form',
-                  builder: (context, state) => PatientForm(),
+                  builder: (context, state) =>
+                      PatientForm(appRouter: GoRouter.of(context)),
                 ),
                 GoRoute(
-                  path: 'patient-file', // Ruta existente
-                  builder: (context, state) => PerfilFile(),
-                ),
-                GoRoute(
-                  path: 'login', // Agrega una nueva ruta para LoginScreen
-                  builder: (context, state) => LoginScreen(),
+                  path: 'login',
+                  builder: (context, state) =>
+                      LoginScreen(appRouter: GoRouter.of(context)),
                 ),
               ],
+            ),
+            GoRoute(
+              path: '/profile',
+              pageBuilder: (context, state) =>
+                  NoTransitionPage(child: PerfilFile()),
             ),
           ],
         ),
