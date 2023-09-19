@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:auth_buttons/auth_buttons.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:go_router/go_router.dart';
 
 class PatientForm extends StatefulWidget {
+  final GoRouter appRouter; // Agrega una propiedad para almacenar el enrutador
+
+  PatientForm({required this.appRouter});
   @override
   _PatientFormState createState() => _PatientFormState();
 }
@@ -28,32 +28,6 @@ class _PatientFormState extends State<PatientForm> {
       setState(() {
         selectedDate = picked;
       });
-    }
-  }
-
-// Agrega la función signInWithGoogle aquí
-  Future<UserCredential> signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleSignInAccount =
-          await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount!.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
-
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-
-      // Utiliza el contexto para redirigir al usuario
-      Navigator.of(context).pushNamed('/test/patient-file');
-
-      return userCredential;
-    } catch (error) {
-      print('Error al iniciar sesión con Google: $error');
-      throw error;
     }
   }
 
@@ -89,24 +63,6 @@ class _PatientFormState extends State<PatientForm> {
                         }
                         return null;
                       }),
-                      _buildTextField('Correo', (value) {
-                        if (value!.isEmpty) {
-                          return 'Ingrese el correo';
-                        }
-                        if (!_isValidEmail(value)) {
-                          return 'Ingrese un correo válido';
-                        }
-                        return null;
-                      }),
-                      _buildTextField('Contraseña', (value) {
-                        if (value!.isEmpty) {
-                          return 'Ingrese la contraseña';
-                        }
-                        if (value.length < 6) {
-                          return 'La contraseña debe tener al menos 6 caracteres';
-                        }
-                        return null;
-                      }, isPassword: true),
                       SizedBox(height: 5),
                       InkWell(
                         onTap: () => _selectDate(context),
@@ -144,14 +100,10 @@ class _PatientFormState extends State<PatientForm> {
                   ),
                 ),
                 SizedBox(height: 20),
-                GoogleAuthButton(
-                  onPressed: signInWithGoogle,
-                ),
-                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Perform form submission
+                      context.go('/profile');
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -160,7 +112,7 @@ class _PatientFormState extends State<PatientForm> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text('Registrarse'),
+                  child: Text('Completar perfil'),
                 ),
               ],
             ),
@@ -170,14 +122,12 @@ class _PatientFormState extends State<PatientForm> {
     );
   }
 
-  Widget _buildTextField(String labelText, String? Function(String?)? validator,
-      {bool isPassword = false}) {
+  Widget _buildTextField(
+      String labelText, String? Function(String?)? validator) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: TextFormField(
         validator: validator,
-        obscureText:
-            isPassword, // Utiliza obscureText para ocultar la contraseña
         style: TextStyle(
           fontSize: 16,
           fontFamily: 'Nunito',
@@ -193,10 +143,5 @@ class _PatientFormState extends State<PatientForm> {
         ),
       ),
     );
-  }
-
-  bool _isValidEmail(String email) {
-    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
-    return emailRegExp.hasMatch(email);
   }
 }

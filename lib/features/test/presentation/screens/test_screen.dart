@@ -35,7 +35,8 @@ class TestScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  context.go(subPath);
+                  // context.go(subPath);
+                  context.go('/test/login');
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -43,17 +44,8 @@ class TestScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text('Registrarse'),
+                child: Text('¡Únete ahora!'),
               ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  // Redirige a la subruta de inicio de sesión
-                  context.go('/test/login');
-                },
-                child: Text(
-                    '¿Ya tienes una cuenta? Iniciar sesión'), // Cambia el texto según tus necesidades
-              )
             ],
           ),
         ),
