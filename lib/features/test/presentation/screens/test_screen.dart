@@ -46,6 +46,20 @@ class TestScreen extends StatelessWidget {
                 ),
                 child: Text('¡Únete ahora!'),
               ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  // context.go(subPath);
+                  context.go('/quizz');
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text('¡Realizar Test!'),
+              ),
             ],
           ),
         ),

@@ -5,6 +5,7 @@ import 'package:renalizapp/features/home/home.dart';
 import 'package:renalizapp/features/test/presentation/screens/login_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
 import 'package:renalizapp/features/test/presentation/screens/perfil_file.dart';
+import 'package:renalizapp/features/test/presentation/screens/questions_interface.dart';
 import 'package:renalizapp/features/test/test.dart';
 
 import '../../features/shared/widgets/scaffold_with_nested_navigation/scaffold_nested.dart';
@@ -57,6 +58,13 @@ final appRouter =
                       LoginScreen(appRouter: GoRouter.of(context)),
                 ),
               ],
+            ),
+            GoRoute(
+              path: '/quizz',
+              pageBuilder: (context, state) => NoTransitionPage(
+                  child: QuizzPage(
+                appRouter: GoRouter.of(context),
+              )),
             ),
             GoRoute(
               path: '/profile',
