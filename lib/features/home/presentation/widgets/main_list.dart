@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -16,36 +15,18 @@ class _MainListState extends State<MainList> {
   late Future blogs;
 
 // Fetch Data
-  Future fetchBlogs() async {
-    String uri = dotenv.env['API_URL']! + 'getAllBlogs';
-
-    var res;
-    try {
-      res = await http.post(Uri.parse(uri),
-          headers: {HttpHeaders.authorizationHeader: "bearer "});
-    } catch (error) {
-      print(error);
-      return null;
-    }
-
-    return res;
-  }
 
   Future<List> _getBlogs() async {
-    // print("Token: *${dotenv.env["TOKEN"]}*");
-    // print("URI: *${dotenv.env["API_URL"]}getAllBlogs*");
-
     Uri uri = Uri.parse(dotenv.env['API_URL']! + 'getAllBlogs');
 
-    Map<String, String> headers = {
-      "Authorization": "bearer ${dotenv.env['TOKEN']}"
-    };
+    final headers = {'Accept': 'application/json'};
 
-    final response = await http.post(uri, headers: headers);
+    final body = {"perPage": "10", "page": "1"};
+
+    final response = await http.post(uri, headers: headers, body: body);
 
     if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      return body;
+      return jsonDecode(response.body)['response'];
     } else {
       throw Exception('Error: ${response.statusCode}');
     }
@@ -70,6 +51,7 @@ class _MainListState extends State<MainList> {
               builder: (context, setState) => ListView.builder(
                     itemCount: blogs.length,
                     itemBuilder: (context, index) {
+                      final blog = blogs[index] as Map;
                       return Card(
                         elevation:
                             2, // Puedes ajustar la elevación según tus preferencias
@@ -78,28 +60,31 @@ class _MainListState extends State<MainList> {
                               16), // Ajusta el relleno según tus necesidades
                           leading: CircleAvatar(
                             backgroundImage: NetworkImage(
-                              blogs[index]['article']['cover_image'],
+                              blog['cover_image'],
                             ),
                           ),
                           title: Text(
-                            blogs[index]['article']['title'],
+                            blog['title'],
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(blogs[index]['article']['category']),
-                              Text(
-                                  "Autor: ${blogs[index]['article']['author']}"),
-                              Text(blogs[index]['article']['publication_date']
-                                  .toString()),
-                              Text(blogs[index]['article']['description']),
+                              Text(blog['category']),
+                              Text("Autor: ${blog['author']}"),
+                              Text(DateTime.fromMicrosecondsSinceEpoch(
+                                      blog['publication_date']["_seconds"] *
+                                          1000000)
+                                  .toLocal()
+                                  .toString()
+                                  .split('.')[0]),
+                              Text(blog['description']),
                             ],
                           ),
                           trailing: IconButton(
                             icon: Icon(
                               Icons.star,
-                              color: blogs[index]['article']['isEstrellado']
+                              color: blog['isStarred']
                                   ? Colors.yellow
                                   : Colors
                                       .grey, // Color de la estrella según el valor de isEstrellado
