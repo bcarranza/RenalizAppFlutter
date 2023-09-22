@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 class PatientForm extends StatefulWidget {
-  final GoRouter appRouter; // Agrega una propiedad para almacenar el enrutador
+  final GoRouter appRouter;
 
   PatientForm({required this.appRouter});
   @override

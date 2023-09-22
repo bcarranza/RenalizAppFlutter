@@ -19,12 +19,6 @@ class TestScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const SizedBox(height: 20),
-              Text(
-                '¡Haz culminado tu test!',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
               Image.asset('assets/renalizapp_icon.png', width: 300),
               const SizedBox(height: 20),
               Text(
@@ -60,6 +54,13 @@ class TestScreen extends StatelessWidget {
                 ),
                 child: Text('¡Realizar Test!'),
               ),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  context.go('/test/historial');
+                },
+                child: Text('¿Quieres ver tu historial?'),
+              )
             ],
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:renalizapp/features/test/presentation/screens/history_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
@@ -31,7 +32,11 @@ class QuizzPage extends StatefulWidget {
   _QuizzPageState createState() => _QuizzPageState();
 }
 
+List<String> testHistory = [];
+
 class _QuizzPageState extends State<QuizzPage> {
+  Map<int, int> _answersMap =
+      {}; // Almacena las respuestas seleccionadas por pregunta
   List<Question> questions = [
     Question(
       question:
@@ -164,7 +169,8 @@ class _QuizzPageState extends State<QuizzPage> {
 
   void _onAnswerSelected(Answer answer) async {
     setState(() {
-      _score += answer.value;
+      // Almacena la respuesta seleccionada en el mapa de respuestas
+      _answersMap[_currentQuestionIndex] = answer.value;
     });
 
     if (_currentQuestionIndex < questions.length - 1) {
@@ -172,6 +178,8 @@ class _QuizzPageState extends State<QuizzPage> {
     } else {
       String resultMessage;
       String resultDescription;
+      // Calcula el puntaje total sumando las respuestas del mapa
+      int _score = _answersMap.values.reduce((a, b) => a + b);
 
       if (_score >= 0 && _score <= 4) {
         resultMessage = "Buenas prácticas para la salud renal.";
@@ -188,23 +196,17 @@ class _QuizzPageState extends State<QuizzPage> {
 
       // Obtiene una instancia de SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      print('Valor de la clave "score": ${prefs.getInt("score")}');
-      print(
-          'Valor de la clave "resultMessage": ${prefs.getString("resultMessage")}');
-      print(
-          'Valor de la clave "resultDescription": ${prefs.getString("resultDescription")}');
-      print('Valor de la clave "testDate": ${prefs.getString("testDate")}');
-
-      // Almacena los datos en SharedPreferences
-      prefs.setInt('score', _score);
-      prefs.setString('resultMessage', resultMessage);
-      prefs.setString('resultDescription', resultDescription);
 
       // Obtiene la fecha actual
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
-      prefs.setString('testDate', formattedDate);
+      // Agrega la cadena actual a testHistory
+      testHistory
+          .add('$_score;$resultMessage;$resultDescription;$formattedDate');
+
+      // Almacena testHistory en SharedPreferences
+      prefs.setStringList('history', testHistory);
 
       showDialog(
         context: context,
