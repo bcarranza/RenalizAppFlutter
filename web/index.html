@@ -19,6 +19,7 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
+  <meta name="google-signin-client_id" content="937615289579-49v5e34783gtfgsvhrmvvf9upv19d2n6.apps.googleusercontent.com">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -54,6 +55,29 @@
         }
       });
     });
+  </script>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAviiHhpxkORUv_QAaXLNmU55g8J8rfT00",
+  authDomain: "renalizapp-2023.firebaseapp.com",
+  projectId: "renalizapp-2023",
+  storageBucket: "renalizapp-2023.appspot.com",
+  messagingSenderId: "937615289579",
+  appId: "1:937615289579:web:09dea19fecc5894bc0a2ae",
+  measurementId: "G-4K3EJFGFKM"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
   </script>
 </body>
 </html>

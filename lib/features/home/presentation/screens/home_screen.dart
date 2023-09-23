@@ -1,59 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:renalizapp/features/shared/shared.dart';
-class HomeScreen extends StatefulWidget {
+import 'package:renalizapp/features/home/presentation/widgets/main_list.dart';
 
-  static const String name = 'home_screen';
+class HomeScreen extends StatelessWidget {
+  /// Creates a RootScreen
+  const HomeScreen({required this.subPath, Key? key}) : super(key: key);
 
-const HomeScreen({ Key? key }) : super(key: key);
+  /// The label
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-
-  int selectedIndex = 1;
-
-
-  bool wideScreen = false;
+  /// The path to the detail page
+  final String subPath;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final double width = MediaQuery.of(context).size.width;
-    wideScreen = width > 600;
-  }
-
-  @override
-  Widget build(BuildContext context){
-    final colorScheme = Theme.of(context).colorScheme;
-    return  Scaffold(
-        body: Row(
-          children: [
-            if (wideScreen)
-            DisappearingNavigationDrawer(
-              selectedIndex: selectedIndex,
-              backgroundColor: colorScheme.tertiaryContainer,
-              onDestinationSelected: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
-            ),
-          ],
-          ),
-          bottomNavigationBar: wideScreen
-          ? null
-          : DisappearingBottomNavigationBar(
-              selectedIndex: selectedIndex,
-              onDestinationSelected: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
-            ),
-          
-      );
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Renalizapp'),
+      ),
+      body: Center(child: MainList()),
+    );
   }
 }
