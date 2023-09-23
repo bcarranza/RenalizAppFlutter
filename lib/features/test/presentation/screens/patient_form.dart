@@ -1,11 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:auth_buttons/auth_buttons.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 
 class PatientForm extends StatefulWidget {
+  final GoRouter appRouter;
+
+  PatientForm({required this.appRouter});
   @override
   _PatientFormState createState() => _PatientFormState();
 }
@@ -14,6 +16,10 @@ class _PatientFormState extends State<PatientForm> {
   DateTime? selectedDate;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  // Define los controladores para los campos de texto
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = (await showDatePicker(
@@ -31,29 +37,32 @@ class _PatientFormState extends State<PatientForm> {
     }
   }
 
-// Agrega la función signInWithGoogle aquí
-  Future<UserCredential> signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleSignInAccount =
-          await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount!.authentication;
+  Future<int> _httpsCall() async {
+    final user = FirebaseAuth.instance.currentUser;
 
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
+    final idTokenResult = await user?.getIdTokenResult();
+    final token = idTokenResult?.token;
 
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+    Uri uri = Uri.parse(
+        'https://us-central1-renalizapp-2023.cloudfunctions.net/renalizapp-2023-prod-postRegister');
 
-      // Utiliza el contexto para redirigir al usuario
-      Navigator.of(context).pushNamed('/test/patient-file');
+    final body = {
+      'name': _nameController.text,
+      'dob': selectedDate.toString(),
+      'address': _addressController.text,
+      'phoneNumber': _phoneNumberController.text,
+      'uid': user?.uid.toString(),
+    };
+    final response = await http.post(uri, body: body);
 
-      return userCredential;
-    } catch (error) {
-      print('Error al iniciar sesión con Google: $error');
-      throw error;
+    if (response.statusCode == 201) {
+      return response.statusCode;
+    } else {
+      print(_nameController.text);
+      print(selectedDate.toString());
+      print(_addressController.text);
+      print(_phoneNumberController.text);
+      throw Exception('Error: ${response.statusCode}');
     }
   }
 
@@ -88,25 +97,7 @@ class _PatientFormState extends State<PatientForm> {
                           return 'Ingrese los nombres';
                         }
                         return null;
-                      }),
-                      _buildTextField('Correo', (value) {
-                        if (value!.isEmpty) {
-                          return 'Ingrese el correo';
-                        }
-                        if (!_isValidEmail(value)) {
-                          return 'Ingrese un correo válido';
-                        }
-                        return null;
-                      }),
-                      _buildTextField('Contraseña', (value) {
-                        if (value!.isEmpty) {
-                          return 'Ingrese la contraseña';
-                        }
-                        if (value.length < 6) {
-                          return 'La contraseña debe tener al menos 6 caracteres';
-                        }
-                        return null;
-                      }, isPassword: true),
+                      }, controller: _nameController), // Asigna _nameController
                       SizedBox(height: 5),
                       InkWell(
                         onTap: () => _selectDate(context),
@@ -133,25 +124,54 @@ class _PatientFormState extends State<PatientForm> {
                           return 'Ingrese la dirección';
                         }
                         return null;
-                      }),
+                      },
+                          controller:
+                              _addressController), // Asigna _addressController
                       _buildTextField('Teléfono', (value) {
                         if (value!.isEmpty) {
                           return 'Ingrese el teléfono';
                         }
                         return null;
-                      }),
+                      },
+                          controller:
+                              _phoneNumberController), // Asigna _phoneNumberController
                     ],
                   ),
                 ),
                 SizedBox(height: 20),
-                GoogleAuthButton(
-                  onPressed: signInWithGoogle,
-                ),
-                SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // Perform form submission
+                      try {
+                        final responseCode = await _httpsCall();
+                        if (responseCode == 201) {
+                          // Procesa la respuesta exitosa aquí
+                          // Por ejemplo, puedes redirigir al usuario a una página de éxito
+                          // o mostrar un mensaje de éxito.
+                          widget.appRouter.go('/profile');
+                        } else {
+                          // Mostrar un mensaje de error al usuario
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Error al enviar el formulario. Por favor, inténtelo de nuevo. Detalles del error: $responseCode',
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        // Manejo de errores
+                        print('Error: $e');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Error al enviar el formulario. Por favor, inténtelo de nuevo.',
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -160,7 +180,7 @@ class _PatientFormState extends State<PatientForm> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text('Registrarse'),
+                  child: Text('Completar perfil'),
                 ),
               ],
             ),
@@ -170,14 +190,16 @@ class _PatientFormState extends State<PatientForm> {
     );
   }
 
-  Widget _buildTextField(String labelText, String? Function(String?)? validator,
-      {bool isPassword = false}) {
+  Widget _buildTextField(
+    String labelText,
+    String? Function(String?)? validator, {
+    required TextEditingController controller, // Agrega el parámetro controller
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: TextFormField(
+        controller: controller, // Asigna el controlador al campo de texto
         validator: validator,
-        obscureText:
-            isPassword, // Utiliza obscureText para ocultar la contraseña
         style: TextStyle(
           fontSize: 16,
           fontFamily: 'Nunito',
@@ -193,10 +215,5 @@ class _PatientFormState extends State<PatientForm> {
         ),
       ),
     );
-  }
-
-  bool _isValidEmail(String email) {
-    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
-    return emailRegExp.hasMatch(email);
   }
 }

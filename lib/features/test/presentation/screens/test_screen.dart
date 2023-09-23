@@ -19,12 +19,6 @@ class TestScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const SizedBox(height: 20),
-              Text(
-                '¡Haz culminado tu test!',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
               Image.asset('assets/renalizapp_icon.png', width: 300),
               const SizedBox(height: 20),
               Text(
@@ -35,7 +29,8 @@ class TestScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  context.go(subPath);
+                  // context.go(subPath);
+                  context.go('/test/login');
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -43,16 +38,28 @@ class TestScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text('Registrarse'),
+                child: Text('¡Únete ahora!'),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  // context.go(subPath);
+                  context.go('/quizz');
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text('¡Realizar Test!'),
+              ),
+              const SizedBox(height: 10),
               TextButton(
                 onPressed: () {
-                  // Redirige a la subruta de inicio de sesión
-                  context.go('/test/login');
+                  context.go('/test/historial');
                 },
-                child: Text(
-                    '¿Ya tienes una cuenta? Iniciar sesión'), // Cambia el texto según tus necesidades
+                child: Text('¿Quieres ver tu historial?'),
               )
             ],
           ),

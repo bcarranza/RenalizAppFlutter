@@ -5,6 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
+  final GoRouter appRouter; // Agrega una propiedad para almacenar el enrutador
+
+  LoginScreen({required this.appRouter});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -13,6 +17,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
   bool _isLoading = false;
 
   String? _validateEmail(String? value) {
@@ -35,46 +42,85 @@ class _LoginScreenState extends State<LoginScreen> {
     return null;
   }
 
-  void _signIn() {
+  // Función para manejar el registro
+  void _signUp() async {
     if (_formKey.currentState!.validate()) {
-      // Aquí puedes realizar acciones adicionales después de iniciar sesión con éxito.
       setState(() {
         _isLoading = true;
       });
 
-      // Simulación de inicio de sesión (puedes reemplazar esto con tu lógica real)
-      Future.delayed(Duration(seconds: 2), () {
+      try {
+        // Intenta registrarse con Firebase usando correo y contraseña
+        await _auth.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Si el registro es exitoso, navega a la ruta '/profile'
+        widget.appRouter.go('/test/patient-form'); // Modificación aquí
+      } catch (error) {
+        // Si hay un error, muestra un mensaje al usuario
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al registrarse: $error')),
+        );
+      } finally {
         setState(() {
           _isLoading = false;
         });
-        // Navegar a la siguiente pantalla o realizar acciones adicionales aquí.
-      });
+      }
     }
   }
 
-  // Agrega la función signInWithGoogle aquí
-  Future<UserCredential> signInWithGoogle() async {
+  // Función para manejar el inicio de sesión
+  void _signIn() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Intenta iniciar sesión con Firebase usando correo y contraseña
+        await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Si el inicio de sesión es exitoso, navega a la ruta '/profile'
+        widget.appRouter.go('/profile'); // Modificación aquí
+      } catch (error) {
+        // Si hay un error, muestra un mensaje al usuario
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al iniciar sesión: $error')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleSignInAccount =
-          await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount!.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
-
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-
-      // Utiliza el contexto para redirigir al usuario
-      Navigator.of(context).pushNamed('/test/patient-file');
-
-      return userCredential;
+          await googleSignIn.signIn();
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleSignInAuthentication.idToken,
+          accessToken: googleSignInAuthentication.accessToken,
+        );
+        final UserCredential authResult =
+            await _auth.signInWithCredential(credential);
+        final User? user = authResult.user;
+        if (user != null) {
+          // El usuario se ha registrado con Google correctamente
+          widget.appRouter.go('/test/patient-form'); // Modificación aquí
+        }
+      }
     } catch (error) {
-      print('Error al iniciar sesión con Google: $error');
-      throw error;
+      print(error);
     }
   }
 
@@ -82,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Iniciar Sesión'),
+        title: Text('Iniciar Sesión / Registrarse'),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -96,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset('assets/renalizapp_icon.png', width: 200),
+                    Image.asset('assets/renalizapp_icon.png', width: 250),
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(labelText: 'Correo'),
@@ -109,22 +155,50 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: _validatePassword,
                     ),
                     SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _signIn,
-                      style: ElevatedButton.styleFrom(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _signIn,
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 1, vertical: 10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: _isLoading
+                                  ? CircularProgressIndicator()
+                                  : Text('Iniciar Sesión'),
+                            ),
+                          ),
                         ),
-                      ),
-                      child: _isLoading
-                          ? CircularProgressIndicator()
-                          : Text('Iniciar Sesión'),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _signUp,
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text('Registrarse'),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 20),
                     GoogleAuthButton(
-                      onPressed: signInWithGoogle,
+                      onPressed: () async {
+                        await _signInWithGoogle();
+                      },
                     ),
                     SizedBox(height: 20),
                   ],
