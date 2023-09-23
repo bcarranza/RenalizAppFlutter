@@ -51,17 +51,17 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyAviiHhpxkORUv_QAaXLNmU55g8J8rfT00',
-    appId: '1:937615289579:web:76f706e111b2c0d8c0a2ae',
+    appId: '1:937615289579:web:09dea19fecc5894bc0a2ae',
     messagingSenderId: '937615289579',
     projectId: 'renalizapp-2023',
     authDomain: 'renalizapp-2023.firebaseapp.com',
     storageBucket: 'renalizapp-2023.appspot.com',
-    measurementId: 'G-GKBKNXN594',
+    measurementId: 'G-4K3EJFGFKM',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDdc_iDHs6vUelgao-jFOPAYJIHivrG5SI',
-    appId: '1:937615289579:android:5954b6c57e134256c0a2ae',
+    appId: '1:937615289579:android:3f83b1dbee47c3e7c0a2ae',
     messagingSenderId: '937615289579',
     projectId: 'renalizapp-2023',
     storageBucket: 'renalizapp-2023.appspot.com',
