@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:renalizapp/features/chat/chat.dart';
 import 'package:renalizapp/features/home/home.dart';
+import 'package:renalizapp/features/test/presentation/screens/history_page.dart';
 import 'package:renalizapp/features/test/presentation/screens/login_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
 import 'package:renalizapp/features/test/presentation/screens/perfil_file.dart';
+import 'package:renalizapp/features/test/presentation/screens/questions_interface.dart';
 import 'package:renalizapp/features/test/test.dart';
 
 import '../../features/shared/widgets/scaffold_with_nested_navigation/scaffold_nested.dart';
@@ -48,17 +50,32 @@ final appRouter =
               routes: [
                 GoRoute(
                   path: 'patient-form',
-                  builder: (context, state) => PatientForm(),
+                  builder: (context, state) =>
+                      PatientForm(appRouter: GoRouter.of(context)),
                 ),
                 GoRoute(
-                  path: 'patient-file', // Ruta existente
-                  builder: (context, state) => PerfilFile(),
+                  path: 'login',
+                  builder: (context, state) =>
+                      LoginScreen(appRouter: GoRouter.of(context)),
                 ),
                 GoRoute(
-                  path: 'login', // Agrega una nueva ruta para LoginScreen
-                  builder: (context, state) => LoginScreen(),
+                  path: 'historial',
+                  builder: (context, state) =>
+                      HistoryPage(appRouter: GoRouter.of(context)),
                 ),
               ],
+            ),
+            GoRoute(
+              path: '/quizz',
+              pageBuilder: (context, state) => NoTransitionPage(
+                  child: QuizzPage(
+                appRouter: GoRouter.of(context),
+              )),
+            ),
+            GoRoute(
+              path: '/profile',
+              pageBuilder: (context, state) =>
+                  NoTransitionPage(child: PerfilFile()),
             ),
           ],
         ),
