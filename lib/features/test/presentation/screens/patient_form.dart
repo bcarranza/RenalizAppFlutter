@@ -44,7 +44,7 @@ class _PatientFormState extends State<PatientForm> {
     final token = idTokenResult?.token;
 
     Uri uri = Uri.parse(
-        'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-dev-postRegister');
+        'https://us-central1-renalizapp-2023.cloudfunctions.net/renalizapp-2023-prod-postRegister');
 
     final body = {
       'name': _nameController.text,

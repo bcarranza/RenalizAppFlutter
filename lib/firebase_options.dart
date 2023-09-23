@@ -23,9 +23,15 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -44,42 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAypsjGbLvWfccG-45jZ1AyKNSEhUa5qgc',
-    appId: '1:150217668394:web:ea872452d74cc932d41053',
-    messagingSenderId: '150217668394',
-    projectId: 'renalizapp-dev-2023-396503',
-    authDomain: 'renalizapp-dev-2023-396503.firebaseapp.com',
-    storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
-    measurementId: 'G-RB3TRCTHQ8',
+    apiKey: 'AIzaSyAviiHhpxkORUv_QAaXLNmU55g8J8rfT00',
+    appId: '1:937615289579:web:76f706e111b2c0d8c0a2ae',
+    messagingSenderId: '937615289579',
+    projectId: 'renalizapp-2023',
+    authDomain: 'renalizapp-2023.firebaseapp.com',
+    storageBucket: 'renalizapp-2023.appspot.com',
+    measurementId: 'G-GKBKNXN594',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCv5ZSvpGlCw5KhMF4U2oBd2RSGIVSA2-k',
-    appId: '1:150217668394:android:3b978352699ba020d41053',
-    messagingSenderId: '150217668394',
-    projectId: 'renalizapp-dev-2023-396503',
-    storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAqrgyimEXPoys_Ec2iB0jhQeesz8_5D9M',
-    appId: '1:150217668394:ios:7e7ab4a10cc62a89d41053',
-    messagingSenderId: '150217668394',
-    projectId: 'renalizapp-dev-2023-396503',
-    storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
-    androidClientId: '150217668394-eqsb8rofukteg52tt05sgva381h1a4sf.apps.googleusercontent.com',
-    iosClientId: '150217668394-4fflv4t4kpo7mj8jrqphne5vc769emmv.apps.googleusercontent.com',
-    iosBundleId: 'app.dportillo.renalizapp',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAqrgyimEXPoys_Ec2iB0jhQeesz8_5D9M',
-    appId: '1:150217668394:ios:29569c2126407b21d41053',
-    messagingSenderId: '150217668394',
-    projectId: 'renalizapp-dev-2023-396503',
-    storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
-    androidClientId: '150217668394-eqsb8rofukteg52tt05sgva381h1a4sf.apps.googleusercontent.com',
-    iosClientId: '150217668394-8ifqtbq43c2sscemt3h3jn8e62f5gaup.apps.googleusercontent.com',
-    iosBundleId: 'app.dportillo.renalizapp.RunnerTests',
+    apiKey: 'AIzaSyDdc_iDHs6vUelgao-jFOPAYJIHivrG5SI',
+    appId: '1:937615289579:android:5954b6c57e134256c0a2ae',
+    messagingSenderId: '937615289579',
+    projectId: 'renalizapp-2023',
+    storageBucket: 'renalizapp-2023.appspot.com',
   );
 }
