@@ -26,7 +26,8 @@ class _MainListState extends State<MainList> {
     final response = await http.post(uri, headers: headers, body: body);
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body)['response'];
+    
+      return jsonDecode(response.body)['data'];
     } else {
       throw Exception('Error: ${response.statusCode}');
     }
@@ -41,7 +42,7 @@ class _MainListState extends State<MainList> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
 
         if (snapshot.hasData) {
@@ -56,7 +57,7 @@ class _MainListState extends State<MainList> {
                         elevation:
                             2, // Puedes ajustar la elevación según tus preferencias
                         child: ListTile(
-                          contentPadding: EdgeInsets.all(
+                          contentPadding: const EdgeInsets.all(
                               16), // Ajusta el relleno según tus necesidades
                           leading: CircleAvatar(
                             backgroundImage: NetworkImage(
@@ -65,7 +66,7 @@ class _MainListState extends State<MainList> {
                           ),
                           title: Text(
                             blog['title'],
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
