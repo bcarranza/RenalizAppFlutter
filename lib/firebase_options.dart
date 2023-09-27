@@ -50,20 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAviiHhpxkORUv_QAaXLNmU55g8J8rfT00',
-    appId: '1:937615289579:web:09dea19fecc5894bc0a2ae',
-    messagingSenderId: '937615289579',
-    projectId: 'renalizapp-2023',
-    authDomain: 'renalizapp-2023.firebaseapp.com',
-    storageBucket: 'renalizapp-2023.appspot.com',
-    measurementId: 'G-4K3EJFGFKM',
+    apiKey: 'AIzaSyAypsjGbLvWfccG-45jZ1AyKNSEhUa5qgc',
+    appId: '1:150217668394:web:ea872452d74cc932d41053',
+    messagingSenderId: '150217668394',
+    projectId: 'renalizapp-dev-2023-396503',
+    authDomain: 'renalizapp-dev-2023-396503.firebaseapp.com',
+    storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
+    measurementId: 'G-RB3TRCTHQ8',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDdc_iDHs6vUelgao-jFOPAYJIHivrG5SI',
-    appId: '1:937615289579:android:3f83b1dbee47c3e7c0a2ae',
-    messagingSenderId: '937615289579',
-    projectId: 'renalizapp-2023',
-    storageBucket: 'renalizapp-2023.appspot.com',
+    apiKey: 'AIzaSyCv5ZSvpGlCw5KhMF4U2oBd2RSGIVSA2-k',
+    appId: '1:150217668394:android:3b978352699ba020d41053',
+    messagingSenderId: '150217668394',
+    projectId: 'renalizapp-dev-2023-396503',
+    storageBucket: 'renalizapp-dev-2023-396503.appspot.com',
   );
 }
