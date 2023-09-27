@@ -27,6 +27,7 @@ dependencies:
   cloud_firestore: ^4.9.1
   provider: ^6.0.5
   shared_preferences: ^2.2.1
+  random_avatar: ^0.0.8
 
 
 

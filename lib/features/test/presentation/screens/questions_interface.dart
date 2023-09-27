@@ -151,6 +151,16 @@ class _QuizzPageState extends State<QuizzPage> {
                     fontSize: 16,
                   ),
                 ),
+                SizedBox(height: 10),
+                Text(
+                  "Este test está revisado y avalado por el Doctor Rony Escobar",
+                  style: TextStyle(
+                    fontSize: 16, // Tamaño de fuente personalizado
+                    fontWeight: FontWeight.bold, // Tipo de letra en negrita
+                    // Cambia el tipo de letra aquí (usa una fuente personalizada o una predeterminada)
+                    fontFamily: 'Roboto', // Cambia esto según tus preferencias
+                  ),
+                ),
               ],
             ),
             actions: [

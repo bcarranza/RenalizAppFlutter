@@ -12,21 +12,41 @@ class TestScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Renalizapp'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Image.asset('assets/renalizapp_icon.png', width: 300),
               const SizedBox(height: 20),
-              Text(
-                '¿Deseas formar parte de la \n comunidad?',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
+              ElevatedButton(
+                onPressed: () {
+                  // context.go(subPath);
+                  context.go('/quizz');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.blue, // Cambia el color de fondo a azul
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 35,
+                      vertical: 20), // Aumenta el tamaño del botón
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  '¡Realizar Test!',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors
+                          .white), // Aumenta el tamaño del texto y cambia el color a blanco
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
                   // context.go(subPath);
@@ -39,20 +59,6 @@ class TestScreen extends StatelessWidget {
                   ),
                 ),
                 child: Text('¡Únete ahora!'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  // context.go(subPath);
-                  context.go('/quizz');
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text('¡Realizar Test!'),
               ),
               const SizedBox(height: 10),
               TextButton(
