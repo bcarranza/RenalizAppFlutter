@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:renalizapp/config/config.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'features/shared/infrastructure/provider/auth_provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -10,7 +12,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MainApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthProvider(),
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {

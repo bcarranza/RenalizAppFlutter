@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:renalizapp/features/shared/widgets/navigation/appBar/custom_app_bar.dart';
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
+
+import '../../../shared/infrastructure/provider/auth_provider.dart';
 
 class TestScreen extends StatelessWidget {
   const TestScreen({required this.subPath, Key? key}) : super(key: key);
@@ -9,10 +13,9 @@ class TestScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Renalizapp'),
-      ),
+      appBar: CustomAppBar(),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -27,19 +30,20 @@ class TestScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // context.go(subPath);
-                  context.go('/test/login');
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text('¡Únete ahora!'),
-              ),
+              authProvider.currentUser == null
+                  ? ElevatedButton(
+                      onPressed: () {
+                        context.go('/test/login');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text('¡Únete ahora!'),
+                    )
+                  : SizedBox(),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
