@@ -26,7 +26,6 @@ class _MainListState extends State<MainList> {
     final response = await http.post(uri, headers: headers, body: body);
 
     if (response.statusCode == 200) {
-    
       return jsonDecode(response.body)['data'];
     } else {
       throw Exception('Error: ${response.statusCode}');
@@ -79,7 +78,10 @@ class _MainListState extends State<MainList> {
                                   .toLocal()
                                   .toString()
                                   .split('.')[0]),
-                              Text(blog['description']),
+                              Text(
+                                blog['description'],
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ],
                           ),
                           trailing: IconButton(
