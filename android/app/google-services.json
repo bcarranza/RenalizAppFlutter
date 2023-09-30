@@ -7,20 +7,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:937615289579:android:3f83b1dbee47c3e7c0a2ae",
+        "mobilesdk_app_id": "1:937615289579:android:28d83b72c4dd96d3c0a2ae",
         "android_client_info": {
           "package_name": "app.dportillo.renalizapp"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "937615289579-kid3cetpmv5hrdojo9em9d2o0nn3f30k.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "app.dportillo.renalizapp",
-            "certificate_hash": "9dea1dfb4f26975a59066d3849f4943364870470"
-          }
-        },
         {
           "client_id": "937615289579-49v5e34783gtfgsvhrmvvf9upv19d2n6.apps.googleusercontent.com",
           "client_type": 3
