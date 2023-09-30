@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -98,12 +99,16 @@ class _MainListState extends State<MainList> {
                     controller: _scrollController,
                     itemBuilder: (context, index) {
                       final blog = blogs[index] as Map;
+                      final tags = blog['tags'] as List;
+                      final displayedTags = tags.take(3).toList();
+                      final remainingTagsCount =
+                          tags.length - displayedTags.length;
+                      final isTruncated = remainingTagsCount > 0;
+
                       return Card(
-                        elevation:
-                            2, // Puedes ajustar la elevación según tus preferencias
+                        elevation: 2,
                         child: ListTile(
-                          contentPadding: const EdgeInsets.all(
-                              16), // Ajusta el relleno según tus necesidades
+                          contentPadding: const EdgeInsets.all(16),
                           leading: CircleAvatar(
                             backgroundImage: NetworkImage(
                               blog['cover_image'],
@@ -128,6 +133,37 @@ class _MainListState extends State<MainList> {
                                 blog['description'],
                                 overflow: TextOverflow.ellipsis,
                               ),
+                              displayedTags.isNotEmpty
+                                  ? SizedBox(height: 20)
+                                  : Container(),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: displayedTags
+                                    .map((tag) => Chip(
+                                        label: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 0.0,
+                                              horizontal:
+                                                  2.0), // Ajusta el padding según tus preferencias
+                                          child: Text(tag),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(25.0),
+                                        ),
+                                        backgroundColor: generateColor(tag),
+                                        labelStyle: TextStyle(
+                                          color: Colors.white,
+                                        )))
+                                    .toList(),
+                              ),
+                              isTruncated
+                                  ? Text(
+                                      "(+$remainingTagsCount más)",
+                                      style: TextStyle(color: Colors.blue),
+                                    )
+                                  : SizedBox(), // Si no hay más etiquetas, deja el espacio en blanco
                             ],
                           ),
                           trailing: IconButton(
@@ -135,8 +171,7 @@ class _MainListState extends State<MainList> {
                               Icons.star,
                               color: blog['isStarred']
                                   ? Colors.yellow
-                                  : Colors
-                                      .grey, // Color de la estrella según el valor de isEstrellado
+                                  : Colors.grey,
                             ),
                             onPressed: () {
                               // Maneja la acción cuando se hace clic en la estrella aquí
@@ -155,4 +190,14 @@ class _MainListState extends State<MainList> {
       },
     );
   }
+}
+
+Color generateColor(String text) {
+  final random = Random(text.hashCode);
+  return Color.fromRGBO(
+    random.nextInt(256),
+    random.nextInt(256),
+    random.nextInt(256),
+    1.0,
+  );
 }
