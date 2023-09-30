@@ -38,6 +38,8 @@ class _HistoryPageState extends State<HistoryPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Historial de Puntuaciones"),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back), // Icono de flecha hacia atrás
           onPressed: () {

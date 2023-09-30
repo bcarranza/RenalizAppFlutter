@@ -1,8 +1,9 @@
 import 'package:auth_buttons/auth_buttons.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
+import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   final GoRouter appRouter; // Agrega una propiedad para almacenar el enrutador
@@ -17,8 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   bool _isLoading = false;
 
@@ -51,9 +50,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         // Intenta registrarse con Firebase usando correo y contraseña
-        await _auth.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+        // Llama a la función signUp del AuthProvider
+        authProvider.signUp(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
         );
 
         // Si el registro es exitoso, navega a la ruta '/profile'
@@ -79,10 +81,13 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        // Intenta iniciar sesión con Firebase usando correo y contraseña
-        await _auth.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
+        // Intenta registrarse con Firebase usando correo y contraseña
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+        // Llama a la función signUp del AuthProvider
+        authProvider.signIn(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
         );
 
         // Si el inicio de sesión es exitoso, navega a la ruta '/profile'
@@ -100,35 +105,14 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleSignInAccount =
-          await googleSignIn.signIn();
-      if (googleSignInAccount != null) {
-        final GoogleSignInAuthentication googleSignInAuthentication =
-            await googleSignInAccount.authentication;
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          idToken: googleSignInAuthentication.idToken,
-          accessToken: googleSignInAuthentication.accessToken,
-        );
-        final UserCredential authResult =
-            await _auth.signInWithCredential(credential);
-        final User? user = authResult.user;
-        if (user != null) {
-          // El usuario se ha registrado con Google correctamente
-          widget.appRouter.go('/test/patient-form'); // Modificación aquí
-        }
-      }
-    } catch (error) {
-      print(error);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Iniciar Sesión / Registrarse'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -196,8 +180,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 20),
                     GoogleAuthButton(
-                      onPressed: () async {
-                        await _signInWithGoogle();
+                      onPressed: () {
+                        authProvider.signInWithGoogle(context);
                       },
                     ),
                     SizedBox(height: 20),
