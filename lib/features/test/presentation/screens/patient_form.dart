@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:random_avatar/random_avatar.dart';
 import '../screens/data.dart';
+import 'package:http/http.dart' as http;
 
 class PatientForm extends StatefulWidget {
   final GoRouter appRouter;
@@ -58,6 +58,32 @@ class _PatientFormState extends State<PatientForm> {
     }
   }
 
+  Future<int> postRegisterData(Map<String, dynamic> body) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      final idTokenResult = await user?.getIdTokenResult();
+      final token = idTokenResult?.token;
+
+      final uri = Uri.parse(
+          'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-dev-postRegister');
+
+      final response = await http.post(uri, body: body);
+
+      if (response.statusCode == 201) {
+        return response.statusCode;
+      } else {
+        // Puedes manejar el error aquí si lo deseas, por ejemplo, imprimir los valores del cuerpo (body).
+        print(body);
+        throw Exception('Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Maneja cualquier excepción que pueda ocurrir durante la solicitud
+      print('Error: $e');
+      throw e;
+    }
+  }
+
   void _nextPage() {
     // Realizar validación antes de avanzar a la siguiente página
     if (_currentPage == 0) {
@@ -108,7 +134,7 @@ class _PatientFormState extends State<PatientForm> {
     return null;
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     bool isValid = true;
     if (_currentPage == 0) {
       isValid = _formKeyPage1.currentState!.validate();
@@ -119,9 +145,36 @@ class _PatientFormState extends State<PatientForm> {
     }
 
     if (isValid) {
-      // Aquí puedes agregar la lógica de lo que deseas hacer cuando se envía el formulario
-      // Por ejemplo, redirigir a otra pantalla o realizar otras acciones.
-      widget.appRouter.go('/profile');
+      final user = FirebaseAuth.instance.currentUser;
+      final body = {
+        "uid": user?.uid.toString(),
+        "First_Name": _formData.firstName,
+        "Second_Name": _formData.secondName ?? "",
+        "Last_Name": _formData.firstLastName,
+        "Second_Last_Name": _formData.secondLastName ?? "",
+        "Birth_Date": _formData.dob.toString(),
+        "DPI": _formData.cui,
+        "Telephone_Number": _formData.phoneNumber,
+        "Email": _formData.email ?? "",
+        "Address": _formData.address ?? "",
+        "Department": selectedDepartment,
+        "City": _formData.city,
+        "Blood_Type": _formData.bloodType ?? "",
+        "Civil_Status": _formData.maritalStatus ?? "",
+        "Gender": _formData.gender ?? "",
+      };
+
+      try {
+        final responseCode = await postRegisterData(body);
+
+        if (responseCode == 201) {
+          widget.appRouter.go('/profile');
+        } else {
+          print('Error en la solicitud POST: $responseCode');
+        }
+      } catch (e) {
+        print('Error en la solicitud POST: $e');
+      }
     }
   }
 
@@ -130,8 +183,8 @@ class _PatientFormState extends State<PatientForm> {
       return ElevatedButton(
         onPressed: _nextPage,
         style: ElevatedButton.styleFrom(
-          primary: Colors.blue, // Color de fondo
-          onPrimary: Colors.white, // Color del texto
+          backgroundColor: Colors.blue, // Color de fondo
+          foregroundColor: Colors.white, // Color del texto
           padding: EdgeInsets.symmetric(
               vertical: 16, horizontal: 32), // Aumentar el tamaño
         ),
@@ -144,8 +197,8 @@ class _PatientFormState extends State<PatientForm> {
       return ElevatedButton(
         onPressed: _submitForm,
         style: ElevatedButton.styleFrom(
-          primary: Colors.green, // Color de fondo
-          onPrimary: Colors.white, // Color del texto
+          backgroundColor: Colors.green, // Color de fondo
+          foregroundColor: Colors.white, // Color del texto
           padding: EdgeInsets.symmetric(
               vertical: 16, horizontal: 32), // Aumentar el tamaño
         ),
@@ -162,8 +215,8 @@ class _PatientFormState extends State<PatientForm> {
       return ElevatedButton(
         onPressed: _previousPage,
         style: ElevatedButton.styleFrom(
-          primary: Colors.red, // Color de fondo
-          onPrimary: Colors.white, // Color del texto
+          backgroundColor: Colors.red, // Color de fondo
+          foregroundColor: Colors.white, // Color del texto
           padding: EdgeInsets.symmetric(
               vertical: 16, horizontal: 32), // Aumentar el tamaño
         ),
@@ -177,8 +230,8 @@ class _PatientFormState extends State<PatientForm> {
       return ElevatedButton(
         onPressed: null,
         style: ElevatedButton.styleFrom(
-          primary: Colors.grey, // Color de fondo
-          onPrimary: Colors.white, // Color del texto
+          backgroundColor: Colors.grey, // Color de fondo
+          foregroundColor: Colors.white, // Color del texto
           padding: EdgeInsets.symmetric(
               vertical: 16, horizontal: 32), // Aumentar el tamaño
         ),
@@ -202,10 +255,7 @@ class _PatientFormState extends State<PatientForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: RandomAvatar('saytoonz', height: 150, width: 150),
-            ),
+            Image.asset('assets/renalizapp_icon.png', width: 150),
             Expanded(
               child: PageView(
                 controller: _pageController,
