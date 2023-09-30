@@ -42,6 +42,7 @@ class _MainListState extends State<MainList> {
     if (response.statusCode == 200) {
       allItems = jsonDecode(response.body)['allItems'];
       blogs.addAll(jsonDecode(response.body)['data']);
+      filtredBlogs.addAll(jsonDecode(response.body)['data']);
       loading = false;
       return true;
     } else {
@@ -49,11 +50,14 @@ class _MainListState extends State<MainList> {
     }
   }
 
-  filtrarDatos(String filtro) {
+  void filterData(String filtro) {
     setState(() {
-      filtredBlogs = blogs
-          .where((blog) => blog.toLowerCase().contains(filtro.toLowerCase()))
-          .toList();
+      filtredBlogs = blogs.where((articulo) {
+        return articulo['title'].toLowerCase().contains(filtro.toLowerCase()) ||
+            articulo['category'].toLowerCase().contains(filtro.toLowerCase());
+        // articulo['tags']
+        //     .any((tag) => tag.toLowerCase().contains(filtro.toLowerCase()));
+      }).toList();
     });
   }
 
@@ -70,6 +74,7 @@ class _MainListState extends State<MainList> {
     if (response.statusCode == 200) {
       setState(() {
         blogs.addAll(jsonDecode(response.body)['data']);
+        filtredBlogs.addAll(jsonDecode(response.body)['data']);
       });
       return true;
     } else {
@@ -112,7 +117,7 @@ class _MainListState extends State<MainList> {
                         padding: const EdgeInsets.all(16.0),
                         child: TextField(
                           onChanged: (texto) {
-                            filtrarDatos(texto);
+                            filterData(texto);
                           },
                           decoration: InputDecoration(
                             labelText: "Buscar",
@@ -123,10 +128,10 @@ class _MainListState extends State<MainList> {
                       ),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: blogs.length,
+                          itemCount: filtredBlogs.length,
                           controller: _scrollController,
                           itemBuilder: (context, index) {
-                            final blog = blogs[index] as Map;
+                            final blog = filtredBlogs[index] as Map;
                             final tags = blog['tags'] as List;
                             final displayedTags = tags.take(3).toList();
                             final remainingTagsCount =
