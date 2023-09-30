@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:renalizapp/features/chat/chat.dart';
 import 'package:renalizapp/features/home/home.dart';
+import 'package:renalizapp/features/home/presentation/screens/blog_detail.dart';
 import 'package:renalizapp/features/test/presentation/screens/history_page.dart';
 import 'package:renalizapp/features/test/presentation/screens/login_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
@@ -31,10 +32,16 @@ final appRouter =
         //Home branch
         StatefulShellBranch(navigatorKey: _shellNavigatorHomeKey, routes: [
           GoRoute(
-            path: '/',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: HomeScreen(subPath: '/home/1')),
-          )
+              path: '/',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: HomeScreen(subPath: '/home')),
+              routes: [
+                GoRoute(
+                  path: 'blog-detail',
+                  builder: (context, state) =>
+                      BlogDetail(appRouter: GoRouter.of(context)),
+                )
+              ])
         ]),
 
         StatefulShellBranch(

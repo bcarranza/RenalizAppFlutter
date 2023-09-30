@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:renalizapp/features/home/presentation/widgets/widgets.dart';
 
 class MainList extends StatefulWidget {
   const MainList({super.key});
@@ -105,81 +107,90 @@ class _MainListState extends State<MainList> {
                           tags.length - displayedTags.length;
                       final isTruncated = remainingTagsCount > 0;
 
-                      return Card(
-                        elevation: 2,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16),
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              blog['cover_image'],
-                            ),
-                          ),
-                          title: Text(
-                            blog['title'],
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(blog['category']),
-                              Text("Autor: ${blog['author']}"),
-                              Text(DateTime.fromMicrosecondsSinceEpoch(
-                                      blog['publication_date']["_seconds"] *
-                                          1000000)
-                                  .toLocal()
-                                  .toString()
-                                  .split('.')[0]),
-                              Text(
-                                blog['description'],
-                                overflow: TextOverflow.ellipsis,
+                      return GestureDetector(
+                          onTap: () {
+                            blogDetail = blog;
+                            context.go('/blog-detail');
+                          },
+                          child: Card(
+                            elevation:
+                                2, // Puedes ajustar la elevación según tus preferencias
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(
+                                  16), // Ajusta el relleno según tus necesidades
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  blog['cover_image'],
+                                ),
                               ),
-                              displayedTags.isNotEmpty
-                                  ? SizedBox(height: 20)
-                                  : Container(),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
-                                children: displayedTags
-                                    .map((tag) => Chip(
-                                        label: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 0.0,
-                                              horizontal:
-                                                  2.0), // Ajusta el padding según tus preferencias
-                                          child: Text(tag),
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(25.0),
-                                        ),
-                                        backgroundColor: generateColor(tag),
-                                        labelStyle: TextStyle(
-                                          color: Colors.white,
-                                        )))
-                                    .toList(),
+                              title: Text(
+                                blog['title'],
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
                               ),
-                              isTruncated
-                                  ? Text(
-                                      "(+$remainingTagsCount más)",
-                                      style: TextStyle(color: Colors.blue),
-                                    )
-                                  : SizedBox(), // Si no hay más etiquetas, deja el espacio en blanco
-                            ],
-                          ),
-                          trailing: IconButton(
-                            icon: Icon(
-                              Icons.star,
-                              color: blog['isStarred']
-                                  ? Colors.yellow
-                                  : Colors.grey,
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(blog['category']),
+                                  Text("Autor: ${blog['author']}"),
+                                  Text(DateTime.fromMicrosecondsSinceEpoch(
+                                          blog['publication_date']["_seconds"] *
+                                              1000000)
+                                      .toLocal()
+                                      .toString()
+                                      .split('.')[0]),
+                                  Text(
+                                    blog['description'],
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  displayedTags.isNotEmpty
+                                      ? SizedBox(height: 20)
+                                      : Container(),
+                                  Wrap(
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: displayedTags
+                                        .map((tag) => Chip(
+                                            label: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 0.0,
+                                                  horizontal:
+                                                      2.0), // Ajusta el padding según tus preferencias
+                                              child: Text(tag),
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(25.0),
+                                            ),
+                                            backgroundColor: generateColor(tag),
+                                            labelStyle: TextStyle(
+                                              color: Colors.white,
+                                            )))
+                                        .toList(),
+                                  ),
+                                  isTruncated
+                                      ? Text(
+                                          "(+$remainingTagsCount más)",
+                                          style: TextStyle(color: Colors.blue),
+                                        )
+                                      : SizedBox()
+                                ],
+                              ),
+                              trailing: IconButton(
+                                icon: Icon(
+                                  Icons.star,
+                                  color: blog['isStarred']
+                                      ? Colors.yellow
+                                      : Colors
+                                          .grey, // Color de la estrella según el valor de isEstrellado
+                                ),
+                                onPressed: () {
+                                  // Maneja la acción cuando se hace clic en la estrella aquí
+                                  // Puedes agregar lógica para cambiar el valor de isEstrellado
+                                },
+                              ),
                             ),
-                            onPressed: () {
-                              // Maneja la acción cuando se hace clic en la estrella aquí
-                              // Puedes agregar lógica para cambiar el valor de isEstrellado
-                            },
-                          ),
-                        ),
-                      );
+                          ));
                     },
                   ));
         }
