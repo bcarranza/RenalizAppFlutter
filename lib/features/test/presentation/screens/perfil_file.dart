@@ -18,7 +18,7 @@ class PerfilFile extends StatefulWidget {
 class _PerfilFileState extends State<PerfilFile> {
   Future<Map<String, dynamic>> getUserData(String uid) async {
     final url =
-        'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-dev-getUserByUid';
+        'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-getUserByUid';
 
     final body = {
       "uid": uid,

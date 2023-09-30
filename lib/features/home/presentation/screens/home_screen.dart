@@ -5,7 +5,6 @@ import 'package:renalizapp/features/shared/widgets/navigation/appBar/custom_app_
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({required this.subPath, Key? key}) : super(key: key);
-
   final String subPath;
 
   @override
