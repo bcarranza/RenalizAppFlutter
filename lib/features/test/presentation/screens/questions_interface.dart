@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';  // Importa la biblioteca aquí
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'package:provider/provider.dart';
+import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
 
 class Question {
   final String question;
+  final String type;
   final List<Answer> answers;
 
   Question({
     required this.question,
+    required this.type,
     required this.answers,
   });
 }
@@ -16,469 +24,292 @@ class Question {
 class Answer {
   final int value;
   final String text;
+  bool isSelected;
 
   Answer({
     required this.value,
     required this.text,
+    this.isSelected = false,
   });
 }
 
+class Response {
+  final String id = '';
+  final double score;
+  final List<Map<String, dynamic>> answeredQuestions;
+  final String timestamp;
+
+  Response({
+    required this.score,
+    required this.answeredQuestions,
+    required this.timestamp,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'score': score,
+      'answered_questions': answeredQuestions,
+      'timestamp': timestamp,
+    };
+  }
+}
+
+void main() {
+  final goRouter = GoRouter(
+    routes: [],  // Define tus rutas aquí
+  );
+  runApp(MyApp(appRouter: goRouter));
+}
+
+class MyApp extends StatelessWidget {
+  final GoRouter appRouter;
+
+  MyApp({required this.appRouter});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      localizationsDelegates: [
+        ...GlobalMaterialLocalizations.delegates,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('es', 'ES'),
+      ],
+      home: QuizzPage(appRouter: appRouter),
+    );
+  }
+}
+
 class QuizzPage extends StatefulWidget {
-  final GoRouter appRouter; // Agrega una propiedad para almacenar el enrutador
+  final GoRouter appRouter;
 
   QuizzPage({required this.appRouter});
+
   @override
   _QuizzPageState createState() => _QuizzPageState();
 }
 
-List<String> testHistory = [];
-
 class _QuizzPageState extends State<QuizzPage> {
-  Set<int> _selectedValues = {};
-  int _lastQuestionScore = 0;
-  Map<int, int?> _answersMap =
-      {}; // Almacena las respuestas seleccionadas por pregunta
-  List<Question> questions = [
-    Question(
-      question:
-          "¿Cuántas veces a la semana te ejercitas durante al menos 30 minutos?",
-      answers: [
-        Answer(value: 0, text: "Más de 3 veces"),
-        Answer(value: 1, text: "1-3 veces"),
-        Answer(value: 2, text: "Menos de 1 vez"),
-        Answer(value: 3, text: "No hago ejercicio"),
-      ],
-    ),
-    Question(
-      question: "¿Cómo describirías tu dieta en general?",
-      answers: [
-        Answer(value: 0, text: "Saludable y balanceada"),
-        Answer(
-            value: 1,
-            text:
-                "Mayormente saludable pero ocasionalmente consumo alimentos poco saludables"),
-        Answer(
-            value: 2,
-            text: "Poco saludable con alimentos procesados y altos en sal"),
-        Answer(value: 3, text: "Muy poco saludable"),
-      ],
-    ),
-    Question(
-      question:
-          "¿Te has realizado pruebas de nivel de azúcar en sangre en los últimos 2 años?",
-      answers: [
-        Answer(value: 0, text: "Sí"),
-        Answer(
-            value: 1,
-            text: "No, pero no tengo factores de riesgo para diabetes"),
-        Answer(value: 2, text: "No, y tengo factores de riesgo para diabetes"),
-      ],
-    ),
-    Question(
-      question: "¿Has revisado tu presión arterial en el último año?",
-      answers: [
-        Answer(value: 0, text: "Sí, está dentro del rango normal"),
-        Answer(
-            value: 1, text: "Sí, está ligeramente elevada pero bajo control"),
-        Answer(value: 2, text: "No, pero no tengo factores de riesgo"),
-        Answer(value: 3, text: "No, y tengo factores de riesgo"),
-      ],
-    ),
-    Question(
-      question:
-          "¿Cuántos vasos de agua u otras bebidas consumes en un día promedio?",
-      answers: [
-        Answer(value: 0, text: "8 vasos o más"),
-        Answer(value: 1, text: "4-7 vasos"),
-        Answer(value: 2, text: "Menos de 4 vasos"),
-      ],
-    ),
-    Question(
-      question: "¿Eres fumador/a?",
-      answers: [
-        Answer(value: 0, text: "No"),
-        Answer(value: 3, text: "Sí"),
-      ],
-    ),
-    Question(
-      question:
-          "¿Con qué frecuencia tomas medicamentos antiinflamatorios sin esteroides (NSAIDs) o pastillas para el dolor?",
-      answers: [
-        Answer(value: 0, text: "Nunca o raramente"),
-        Answer(value: 1, text: "Ocasionalmente"),
-        Answer(value: 2, text: "Frecuentemente"),
-      ],
-    ),
-    Question(
-      question: "¿Tienes uno o más de los siguientes factores de alto riesgo?",
-      answers: [
-        Answer(value: 0, text: "Diabetes"),
-        Answer(value: 1, text: "Hipertensión"),
-        Answer(value: 2, text: "Obesidad"),
-        Answer(value: 3, text: "Historial familiar de enfermedad renal"),
-        Answer(value: 4, text: "Ninguno de los anteriores"),
-      ],
-    ),
-  ];
+  late Future<List<Question>> questionsFuture;
+  int questionIndex = 0;
+  double score = 0;
+  List<Map<String, dynamic>> answeredQuestions = [];
 
-  int _currentQuestionIndex = 0;
+  Future<List<Question>> fetchQuizJson() async {
+    final response = await http.post(
+      Uri.parse('https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-getTestById'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'id': 'test2',
+      }),
+    );
+
+  
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> quizMap = json.decode(response.body) as Map<String, dynamic>;
+      return quizMap.entries.map<Question>((entry) {
+        final Map<String, dynamic> questionMap = entry.value as Map<String, dynamic>;
+        final List<Answer> answers = (questionMap['options'] as List<dynamic>).map<Answer>((option) {
+          final Map<String, dynamic> answerMap = option as Map<String, dynamic>;
+          return Answer(
+            value: answerMap['weight'] as int,
+            text: answerMap['text'] as String,
+          );
+        }).toList();
+        return Question(
+          question: questionMap['questionText'] as String,
+          type: questionMap['type'] as String,
+          answers: answers,
+        );
+      }).toList();
+    } else {
+      throw Exception('Failed to load quiz');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-
-    // Retrasa la visualización del diálogo de instrucciones.
-    Future.delayed(Duration.zero, () {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Instrucciones"),
-            content: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Responde a cada pregunta seleccionando la opción que mejor se aplique a ti.",
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  "El test asigna el valor de puntos correspondiente a cada respuesta y los suma al final para obtener tu puntuación total.",
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text("Comenzar"),
-              ),
-            ],
-          );
-        },
-      );
-    });
+    questionsFuture = fetchQuizJson();
   }
 
-  void _onAnswerSelected(Answer answer) async {
-    setState(() {
-      // Verifica si la respuesta ya ha sido seleccionada y actualízala en lugar de sobrescribirla.
-      if (_answersMap.containsKey(_currentQuestionIndex)) {
-        _answersMap[_currentQuestionIndex] = answer.value;
-      } else {
-        _answersMap[_currentQuestionIndex] = answer.value;
-      }
+  
 
-      _answersMap[_currentQuestionIndex] = answer.value;
+  void answerQuestion(List<Question> questions) {
+    Map<String, dynamic> answeredQuestion = {
+      'question': questions[questionIndex].question,
+      'answers': questions[questionIndex].answers.map((answer) {
+        return {
+          'value': answer.value,
+          'text': answer.text,
+          'isSelected': answer.isSelected,
+        };
+      }).toList()
+    };
 
-      // Agregar un mensaje de depuración para verificar el contenido de _answersMap.
-      print("_answersMap: $_answersMap");
-    });
+    answeredQuestions.add(answeredQuestion);
 
-    if (_currentQuestionIndex < questions.length - 1) {
-      _currentQuestionIndex++;
-    }
-  }
-
-  // Define una función para calcular la suma de respuestas de la última pregunta
-  int _calculateLastQuestionScore() {
-    int lastQuestionScore = 0;
-    int lastIndex = questions.length - 1;
-
-    for (int i = 0; i < questions[lastIndex].answers.length; i++) {
-      if (_answersMap.containsKey(lastIndex * 10 + i) &&
-          _answersMap[lastIndex * 10 + i] != null) {
-        if (i == questions[lastIndex].answers.length - 1) {
-          // La última respuesta de la última pregunta vale 0.
-          lastQuestionScore += 0;
-        } else {
-          // Todas las demás respuestas valen 1 punto.
-          lastQuestionScore += 1;
+    if (questions[questionIndex].type == 'multiple') {
+      for (var answer in questions[questionIndex].answers) {
+        if (answer.isSelected) {
+          score += answer.value.toDouble();
         }
       }
-    }
-
-    return lastQuestionScore;
-  }
-
-  // Define una función para mostrar el diálogo de resultados y guardar en SharedPreferences
-  void _showResultDialog() async {
-    String resultMessage;
-    String resultDescription;
-
-    // Calcula el puntaje total sumando las respuestas de las preguntas
-    int totalScore = 0;
-    _answersMap.values.forEach((value) {
-      if (value != null) {
-        totalScore += value;
-      }
-    });
-// Agrega el puntaje de la última pregunta al puntaje total.
-    totalScore += _lastQuestionScore;
-
-    if (totalScore >= 0 && totalScore <= 4) {
-      resultMessage = "Buenas prácticas para la salud renal.";
-      resultDescription = "Sigue cuidando tus riñones.";
-    } else if (totalScore >= 5 && totalScore <= 10) {
-      resultMessage = "Riesgo moderado.";
-      resultDescription = "Considera hablar con un médico para una evaluación.";
     } else {
-      resultMessage = "Riesgo alto.";
-      resultDescription =
-          "Se recomienda consultar a un médico para una evaluación y consejo médico.";
+      final selectedAnswer = questions[questionIndex].answers.firstWhere((answer) => answer.isSelected, orElse: () => Answer(value: 0, text: ''));
+      score += selectedAnswer.value.toDouble();
     }
 
-    // Obtiene una instancia de SharedPreferences
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      questionIndex++;
+    });
 
-    // Obtiene la fecha actual
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+     if (questionIndex >= questions.length) {
+      DateTime now = DateTime.now();
+      String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(now);
+      final response = Response(score: score, answeredQuestions: answeredQuestions, timestamp: formattedDate);
+      final testResultJson = response.toJson();
+      String response1 = jsonEncode(testResultJson);
+      final authProvider = context.read<AuthProvider>();  // Cambio aquí
 
-    // Agrega la cadena actual a testHistory
-    testHistory
-        .add('$totalScore;$resultMessage;$resultDescription;$formattedDate');
-
-    // Almacena testHistory en SharedPreferences
-    prefs.setStringList('history', testHistory);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Puntuación Total"),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Tu puntuación es $totalScore.",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                resultMessage,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                resultDescription,
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Reinicia el total al valor inicial (0).
-                setState(() {
-                  _answersMap.clear();
-                  _currentQuestionIndex = 0;
-                });
-                widget.appRouter.go('/test');
-              },
-              child: Text("Cerrar"),
-            ),
-          ],
-        );
-      },
-    );
+      String? userName = authProvider.currentUser?.displayName;
+      String? uid = authProvider.currentUser?.uid;
+      if (uid != null) {
+        _postTestResult(response1, uid);
+      } else {
+        _saveTestResult(response1);
+      }
+    }
   }
 
+  // Nueva función para realizar la solicitud POST
+  Future<void> _postTestResult(String testResultJson, String uid) async {
+    final url = 'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-postTestResults';
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'uid': uid,  
+        'testResult': jsonDecode(testResultJson),
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Test result posted successfully: ${response.body}');
+    } else {
+      print('Failed to post test result: ${response.statusCode}');
+    }
+  }
+  // Función para guardar el resultado del test en SharedPreferences
+ Future<void> _saveTestResult(String testResultJson) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  
+  // Obtén la lista existente de resultados de test
+  List<String>? existingTestResults = prefs.getStringList('historyTests');
+  
+  // Si la lista existente es null (es decir, no hay resultados guardados previamente), inicialízala como una lista vacía
+  if (existingTestResults == null) {
+    existingTestResults = [];
+  }
+  
+  // Agrega el nuevo resultado a la lista existente
+  existingTestResults.add(testResultJson);
+  
+  // Guarda la lista actualizada de resultados de test
+  await prefs.setStringList('historyTests', existingTestResults);
+  
+  // Imprime la lista actualizada de resultados de test
+  print('Historial de tests guardados: $existingTestResults');
+}
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Test de Evaluación de Riesgo Renal",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-      ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+    return FutureBuilder<List<Question>>(
+      future: questionsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Cargando...'),
+            ),
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Error'),
+            ),
+            body: Center(
+              child: Text('Error: ${snapshot.error}'),
+            ),
+          );
+        } else {
+          final questions = snapshot.data!;
+
+          if (questionIndex >= questions.length) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Cuestionario Completado'),
+              ),
+              body: Center(
+                child: Text('Puntuación: $score'),
+              ),
+            );
+          }
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Cuestionario'),
+            ),
+            body: Column(
               children: [
-                LinearProgressIndicator(
-                  value: (_currentQuestionIndex + 1) / questions.length,
-                  backgroundColor: Colors.grey,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                ),
-                SizedBox(height: 10),
                 Text(
-                  "Pregunta ${_currentQuestionIndex + 1} de ${questions.length}",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+                  questions[questionIndex].question,
+                  style: TextStyle(fontSize: 28),
                 ),
-                SizedBox(height: 10),
-                Text(
-                  questions[_currentQuestionIndex].question,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+                ...questions[questionIndex].answers.map<Widget>((answer) {
+                  return questions[questionIndex].type == 'multiple'
+                      ? CheckboxListTile(
+                          title: Text(answer.text),
+                          value: answer.isSelected,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              answer.isSelected = value!;
+                            });
+                          },
+                        )
+                      : RadioListTile<int>(
+                          title: Text(answer.text),
+                          value: answer.value,
+                          groupValue: questions[questionIndex].answers.indexWhere((answer) => answer.isSelected),
+                          onChanged: (int? value) {
+                            setState(() {
+                              for (var ans in questions[questionIndex].answers) {
+                                ans.isSelected = ans.value == value;
+                              }
+                            });
+                          },
+                        );
+                }).toList(),
+                ElevatedButton(
+                  onPressed: () => answerQuestion(questions),
+                  child: Text('Siguiente'),
                 ),
-                SizedBox(height: 20),
-                if (_currentQuestionIndex == questions.length - 1)
-                  Column(
-                    children: questions[_currentQuestionIndex]
-                        .answers
-                        .asMap()
-                        .entries
-                        .map(
-                          (entry) => Row(
-                            children: [
-                              Checkbox(
-                                value:
-                                    _selectedValues.contains(entry.value.value),
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    if (value != null) {
-                                      if (value) {
-                                        _selectedValues.add(entry.value.value);
-                                        if (entry.value.value ==
-                                            questions[_currentQuestionIndex]
-                                                    .answers
-                                                    .length -
-                                                1) {
-                                          // Asigna 0 puntos a la penúltima opción.
-                                          _lastQuestionScore += 0;
-                                        } else {
-                                          // Asigna 1 punto por opción seleccionada, excepto la penúltima.
-                                          _lastQuestionScore += 1;
-                                        }
-                                      } else {
-                                        _selectedValues
-                                            .remove(entry.value.value);
-                                        if (entry.value.value ==
-                                            questions[_currentQuestionIndex]
-                                                    .answers
-                                                    .length -
-                                                1) {
-                                          // Resta 0 puntos si se desmarca la penúltima opción.
-                                          _lastQuestionScore -= 0;
-                                        } else {
-                                          // Resta 1 punto si se desmarca una opción seleccionada, excepto la penúltima.
-                                          _lastQuestionScore -= 1;
-                                        }
-                                      }
-                                    }
-                                  });
-                                },
-                              ),
-                              Text(
-                                entry.value.text,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        )
-                        .toList(),
-                  )
-                else
-                  Column(
-                    children: questions[_currentQuestionIndex]
-                        .answers
-                        .asMap()
-                        .entries
-                        .map(
-                          (entry) => Column(
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => _onAnswerSelected(entry.value),
-                                child: Text(
-                                  entry.value.text,
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.all(16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  minimumSize: Size(double.infinity, 48),
-                                ),
-                              ),
-                              if (entry.key <
-                                  questions[_currentQuestionIndex]
-                                          .answers
-                                          .length -
-                                      1)
-                                SizedBox(height: 10),
-                            ],
-                          ),
-                        )
-                        .toList(),
-                  ),
-                SizedBox(height: 20),
-                if (_currentQuestionIndex > 0)
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _currentQuestionIndex--;
-                      });
-                    },
-                    child: Text("Regresar"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.all(16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      minimumSize: Size(double.infinity, 48),
-                    ),
-                  ),
-                const SizedBox(height: 10),
-                if (_currentQuestionIndex == questions.length - 1)
-                  ElevatedButton(
-                    onPressed: _showResultDialog,
-                    child: Text("Terminar Test"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.all(16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      minimumSize: Size(double.infinity, 48),
-                    ),
-                  ),
               ],
             ),
-          ),
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 }
