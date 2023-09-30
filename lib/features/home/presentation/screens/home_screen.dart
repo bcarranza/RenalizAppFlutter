@@ -10,9 +10,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: AppBar(
+        title: const Text('Renalizapp'),
+      ),
       body: Center(child: MainList()),
     );
   }
