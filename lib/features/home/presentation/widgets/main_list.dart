@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -14,21 +15,53 @@ class MainList extends StatefulWidget {
 }
 
 class _MainListState extends State<MainList> {
-  late Future blogs;
+  ScrollController _scrollController = ScrollController();
+  List blogs = [];
+  int perPage = 10;
+  int page = 1;
+  int allItems = 0;
+  bool loading = false;
 
 // Fetch Data
 
-  Future<List> _getBlogs() async {
+  Future _getBlogs() async {
+    if (blogs.isNotEmpty) {
+      return true;
+    }
+
     Uri uri = Uri.parse(dotenv.env['API_URL']! + 'getAllBlogs');
 
     final headers = {'Accept': 'application/json'};
 
-    final body = {"perPage": "10", "page": "1"};
+    final body = {"perPage": perPage.toString(), "page": page.toString()};
 
     final response = await http.post(uri, headers: headers, body: body);
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body)['data'];
+      allItems = jsonDecode(response.body)['allItems'];
+      blogs.addAll(jsonDecode(response.body)['data']);
+      loading = false;
+      return true;
+    } else {
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
+
+  _loadMoreBlogs() async {
+    Uri uri = Uri.parse(dotenv.env['API_URL']! + 'getAllBlogs');
+
+    final headers = {'Accept': 'application/json'};
+
+    page++;
+    final body = {"perPage": perPage.toString(), "page": page.toString()};
+
+    final response = await http.post(uri, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      setState(() {
+        blogs.addAll(jsonDecode(response.body)['data']);
+      });
+      return true;
     } else {
       throw Exception('Error: ${response.statusCode}');
     }
@@ -36,7 +69,13 @@ class _MainListState extends State<MainList> {
 
   @override
   Widget build(BuildContext context) {
-    // blogs = fetchBlogs();
+    _scrollController.addListener(() async {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          ((perPage * page) <= allItems)) {
+        await _loadMoreBlogs();
+      }
+    });
 
     return FutureBuilder(
       future: _getBlogs(),
@@ -47,13 +86,27 @@ class _MainListState extends State<MainList> {
         }
 
         if (snapshot.hasData) {
-          var blogs = snapshot.data;
+          // List mapBlogs = blogs.map((e) {
+          //   e['publication_date'] = Map.from(e['publication_date']);
+
+          //   return Map.from(e);
+          // }).toList();
+
+          // mapBlogs.sort((a, b) => b['publication_date']['_seconds']
+          //     .compareTo(a['publication_date']['_seconds']));
 
           return StatefulBuilder(
               builder: (context, setState) => ListView.builder(
                     itemCount: blogs.length,
+                    controller: _scrollController,
                     itemBuilder: (context, index) {
                       final blog = blogs[index] as Map;
+                      final tags = blog['tags'] as List;
+                      final displayedTags = tags.take(3).toList();
+                      final remainingTagsCount =
+                          tags.length - displayedTags.length;
+                      final isTruncated = remainingTagsCount > 0;
+
                       return GestureDetector(
                           onTap: () {
                             blogDetail = blog;
@@ -86,7 +139,41 @@ class _MainListState extends State<MainList> {
                                       .toLocal()
                                       .toString()
                                       .split('.')[0]),
-                                  Text(blog['description']),
+                                  Text(
+                                    blog['description'],
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  displayedTags.isNotEmpty
+                                      ? SizedBox(height: 20)
+                                      : Container(),
+                                  Wrap(
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: displayedTags
+                                        .map((tag) => Chip(
+                                            label: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 0.0,
+                                                  horizontal:
+                                                      2.0), // Ajusta el padding según tus preferencias
+                                              child: Text(tag),
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(25.0),
+                                            ),
+                                            backgroundColor: generateColor(tag),
+                                            labelStyle: TextStyle(
+                                              color: Colors.white,
+                                            )))
+                                        .toList(),
+                                  ),
+                                  isTruncated
+                                      ? Text(
+                                          "(+$remainingTagsCount más)",
+                                          style: TextStyle(color: Colors.blue),
+                                        )
+                                      : SizedBox()
                                 ],
                               ),
                               trailing: IconButton(
@@ -114,4 +201,14 @@ class _MainListState extends State<MainList> {
       },
     );
   }
+}
+
+Color generateColor(String text) {
+  final random = Random(text.hashCode);
+  return Color.fromRGBO(
+    random.nextInt(256),
+    random.nextInt(256),
+    random.nextInt(256),
+    1.0,
+  );
 }
