@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:renalizapp/features/shared/widgets/navigation/appBar/custom_app_bar.dart';
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
+
+import '../../../shared/infrastructure/provider/auth_provider.dart';
 
 class TestScreen extends StatelessWidget {
   const TestScreen({required this.subPath, Key? key}) : super(key: key);
@@ -9,48 +13,42 @@ class TestScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Renalizapp'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      appBar: CustomAppBar(),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               Image.asset('assets/renalizapp_icon.png', width: 300),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // context.go(subPath);
-                  context.go('/quizz');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.blue, // Cambia el color de fondo a azul
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 35,
-                      vertical: 20), // Aumenta el tamaño del botón
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  '¡Realizar Test!',
-                  style: TextStyle(
-                      fontSize: 20,
-                      color: Colors
-                          .white), // Aumenta el tamaño del texto y cambia el color a blanco
-                ),
+              Text(
+                '¿Deseas formar parte de la \n comunidad?',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
               ),
+              const SizedBox(height: 20),
+              authProvider.currentUser == null
+                  ? ElevatedButton(
+                      onPressed: () {
+                        context.go('/test/login');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text('¡Únete ahora!'),
+                    )
+                  : SizedBox(),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
                   // context.go(subPath);
-                  context.go('/test/login');
+                  context.go('/quizz');
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -58,7 +56,7 @@ class TestScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text('¡Únete ahora!'),
+                child: Text('¡Realizar Test!'),
               ),
               const SizedBox(height: 10),
               TextButton(
