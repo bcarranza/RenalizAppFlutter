@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
+import 'package:renalizapp/features/shared/widgets/navigation/appBar/custom_app_bar.dart';
 
 class PerfilFile extends StatefulWidget {
   @override
@@ -9,57 +12,52 @@ class PerfilFile extends StatefulWidget {
 }
 
 class _PerfilFileState extends State<PerfilFile> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   final GoogleSignIn googleSignIn = GoogleSignIn();
-
-  // Función para cerrar sesión
-  void _signOut() async {
-    try {
-      // Cerrar sesión con Firebase Auth
-      await _auth.signOut();
-
-      // Cerrar sesión con Google Sign-In (si se ha iniciado sesión con Google)
-      await googleSignIn.signOut();
-
-      // Luego, puedes navegar de vuelta a la pantalla de inicio de sesión o a donde desees
-      GoRouter.of(context)
-          .go('/test'); // Asegúrate de que la ruta sea la correcta
-    } catch (error) {
-      print('Error al cerrar sesión: $error');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     // Obtener el usuario actualmente autenticado
-    User? user = _auth.currentUser;
+   final authProvider = Provider.of<AuthProvider>(context);
 
     // Obtener el nombre del usuario (puedes personalizar esto según tu sistema de autenticación)
-    String? userName = user?.displayName;
+    String? userName = authProvider.currentUser?.displayName;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Perfil'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: _signOut,
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Mostrar un mensaje de bienvenida con el nombre del usuario
-            Text(
-              'Bienvenido',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            if (authProvider.currentUser == null) // Conditionally show the message and login button
+              Column(
+                children: [
+                  Text(
+                    "Parece que no has iniciado sesión",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Navigate to the login screen when the button is pressed
+                      context.go('/test/login');
+                    },
+                    child: Text("Inicia sesión ahora"),
+                  ),
+                ],
               ),
-            ),
-            // Contenido adicional de tu pantalla de perfil
+            if (authProvider.currentUser != null) // Show welcome message for authenticated users
+              Text(
+                'Bienvenido, $userName', // Display the user's name if available
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            // Additional content for your profile screen
           ],
         ),
       ),
