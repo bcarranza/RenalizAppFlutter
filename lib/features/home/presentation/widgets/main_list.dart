@@ -124,7 +124,10 @@ class _MainListState extends State<MainList> {
                                   .toLocal()
                                   .toString()
                                   .split('.')[0]),
-                              Text(blog['description']),
+                              Text(
+                                blog['description'],
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ],
                           ),
                           trailing: IconButton(
