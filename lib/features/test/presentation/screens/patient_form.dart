@@ -66,7 +66,7 @@ class _PatientFormState extends State<PatientForm> {
       final token = idTokenResult?.token;
 
       final uri = Uri.parse(
-          'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-dev-postRegister');
+          'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-postRegister');
 
       final response = await http.post(uri, body: body);
 

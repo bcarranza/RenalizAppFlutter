@@ -100,7 +100,7 @@ class _QuizzPageState extends State<QuizzPage> {
 
   Future<List<Question>> fetchQuizJson() async {
     final response = await http.post(
-      Uri.parse('https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-dev-getTestById'),
+      Uri.parse('https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-getTestById'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -190,7 +190,7 @@ class _QuizzPageState extends State<QuizzPage> {
 
   // Nueva función para realizar la solicitud POST
   Future<void> _postTestResult(String testResultJson, String uid) async {
-    final url = 'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-dev-postTestResults';
+    final url = 'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-postTestResults';
 
     final response = await http.post(
       Uri.parse(url),

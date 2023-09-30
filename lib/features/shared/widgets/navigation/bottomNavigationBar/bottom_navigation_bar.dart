@@ -16,7 +16,6 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: body,
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
