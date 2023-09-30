@@ -50,12 +50,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         // Intenta registrarse con Firebase usando correo y contraseña
-       final authProvider = Provider.of<AuthProvider>(context,listen: false);
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      // Llama a la función signUp del AuthProvider
+        // Llama a la función signUp del AuthProvider
         authProvider.signUp(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
         );
 
         // Si el registro es exitoso, navega a la ruta '/profile'
@@ -81,13 +81,13 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-         // Intenta registrarse con Firebase usando correo y contraseña
-       final authProvider = Provider.of<AuthProvider>(context,listen: false);
+        // Intenta registrarse con Firebase usando correo y contraseña
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      // Llama a la función signUp del AuthProvider
+        // Llama a la función signUp del AuthProvider
         authProvider.signIn(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
         );
 
         // Si el inicio de sesión es exitoso, navega a la ruta '/profile'
@@ -105,11 +105,9 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-   final authProvider = Provider.of<AuthProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Iniciar Sesión / Registrarse'),
@@ -182,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 20),
                     GoogleAuthButton(
-                      onPressed: ()  {
+                      onPressed: () {
                         authProvider.signInWithGoogle(context);
                       },
                     ),
