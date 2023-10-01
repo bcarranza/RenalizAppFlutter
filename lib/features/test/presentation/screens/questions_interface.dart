@@ -192,10 +192,10 @@ class _QuizzPageState extends State<QuizzPage> {
 
   // Nueva función para realizar la solicitud POST
   Future<void> _postTestResult(String testResultJson, String uid) async {
-    final url = 'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-postTestResults';
+    final Uri uri = Uri.parse(dotenv.env['API_URL']! + 'postTestResults');  // Utiliza dotenv aquí
 
     final response = await http.post(
-      Uri.parse(url),
+      uri,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -210,7 +210,13 @@ class _QuizzPageState extends State<QuizzPage> {
     } else {
       print('Failed to post test result: ${response.statusCode}');
     }
-  }
+}
+
+
+
+
+
+  
   // Función para guardar el resultado del test en SharedPreferences
  Future<void> _saveTestResult(String testResultJson) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
