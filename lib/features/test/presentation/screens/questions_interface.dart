@@ -186,6 +186,26 @@ class _QuizzPageState extends State<QuizzPage> {
         _postTestResult(response1, uid);
       } else {
         _saveTestResult(response1);
+
+
+          String riskMessage;
+      String riskDescription;
+
+      if (score >= 0 && score <= 4) {
+        riskMessage = "Buenas prácticas para la salud renal.";
+        riskDescription = "Sigue cuidando tus riñones.";
+      } else if (score >= 5 && score <= 10) {
+        riskMessage = "Riesgo moderado.";
+        riskDescription = "Considera hablar con un médico para una evaluación.";
+      } else {
+        riskMessage = "Riesgo alto.";
+        riskDescription =
+            "Se recomienda consultar a un médico para una evaluación y consejo médico.";
+      }
+
+      _saveToHistory(riskMessage, riskDescription);  // Llamada al nuevo método aquí
+
+    
       }
     }
   }
@@ -213,7 +233,25 @@ class _QuizzPageState extends State<QuizzPage> {
 }
 
 
+Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(now);
+
+    String newResult = "$score;$riskMessage;$riskDescription;$formattedDate";
+
+    List<String>? existingResults = prefs.getStringList('history');
+
+    if (existingResults == null) {
+      existingResults = [newResult];
+    } else {
+      existingResults.add(newResult);
+    }
+
+    await prefs.setStringList('history', existingResults);
+    print('Historial de tests para USUARIO: $existingResults');
+  }
 
 
   
