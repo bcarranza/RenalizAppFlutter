@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class Question {
   final String question;
@@ -99,8 +101,10 @@ class _QuizzPageState extends State<QuizzPage> {
   List<Map<String, dynamic>> answeredQuestions = [];
 
   Future<List<Question>> fetchQuizJson() async {
+    final Uri uri = Uri.parse(dotenv.env['API_URL']! + 'getTestById');  // Utiliza dotenv aquí
+
     final response = await http.post(
-      Uri.parse('https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-getTestById'),
+      uri,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -108,8 +112,6 @@ class _QuizzPageState extends State<QuizzPage> {
         'id': 'test2',
       }),
     );
-
-  
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> quizMap = json.decode(response.body) as Map<String, dynamic>;
