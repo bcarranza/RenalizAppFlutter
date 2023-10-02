@@ -95,6 +95,7 @@ class QuizzPage extends StatefulWidget {
 }
 
 class _QuizzPageState extends State<QuizzPage> {
+  bool isZeroSelected = false;
   late Future<List<Question>> questionsFuture;
   int questionIndex = 0;
   double score = 0;
@@ -173,42 +174,115 @@ class _QuizzPageState extends State<QuizzPage> {
     });
 
      if (questionIndex >= questions.length) {
+     
+
+
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(now);
       final response = Response(score: score, answeredQuestions: answeredQuestions, timestamp: formattedDate);
       final testResultJson = response.toJson();
       String response1 = jsonEncode(testResultJson);
       final authProvider = context.read<AuthProvider>();  // Cambio aquí
+      String riskMessage;
+      String riskDescription;
 
       String? userName = authProvider.currentUser?.displayName;
       String? uid = authProvider.currentUser?.uid;
+
       if (uid != null) {
+
+        if (score >= 0 && score <= 4) {
+            riskMessage = "Buenas prácticas para la salud renal.";
+            riskDescription = "Sigue cuidando tus riñones.";
+          } else if (score >= 5 && score <= 10) {
+            riskMessage = "Riesgo moderado.";
+            riskDescription = "Considera hablar con un médico para una evaluación.";
+          } else {
+            riskMessage = "Riesgo alto.";
+            riskDescription =
+                "Se recomienda consultar a un médico para una evaluación y consejo médico.";
+          }
         _postTestResult(response1, uid);
-      } else {
-        _saveTestResult(response1);
+        _saveToHistory(riskMessage, riskDescription);
+        showRedirectDialog(context,score,riskMessage, riskDescription);
+
+      } 
+      
+      else {
+          
+          if (score >= 0 && score <= 4) {
+            riskMessage = "Buenas prácticas para la salud renal.";
+            riskDescription = "Sigue cuidando tus riñones.";
+          } else if (score >= 5 && score <= 10) {
+            riskMessage = "Riesgo moderado.";
+            riskDescription = "Considera hablar con un médico para una evaluación.";
+          } else {
+            riskMessage = "Riesgo alto.";
+            riskDescription =
+                "Se recomienda consultar a un médico para una evaluación y consejo médico.";
+          }
 
 
-          String riskMessage;
-      String riskDescription;
-
-      if (score >= 0 && score <= 4) {
-        riskMessage = "Buenas prácticas para la salud renal.";
-        riskDescription = "Sigue cuidando tus riñones.";
-      } else if (score >= 5 && score <= 10) {
-        riskMessage = "Riesgo moderado.";
-        riskDescription = "Considera hablar con un médico para una evaluación.";
-      } else {
-        riskMessage = "Riesgo alto.";
-        riskDescription =
-            "Se recomienda consultar a un médico para una evaluación y consejo médico.";
+          _saveTestResult(response1);
+          _saveToHistory(riskMessage, riskDescription);  // Llamada al nuevo método aquí
+          showRedirectDialog(context,score,riskMessage, riskDescription);
       }
-
-      _saveToHistory(riskMessage, riskDescription);  // Llamada al nuevo método aquí
-
-    
-      }
+      
+      
     }
   }
+
+
+  
+  void navigateToLogin(BuildContext context) {
+    final goRouter = GoRouter.of(context);
+    goRouter.go('/test');
+  }
+
+  Future<void> showRedirectDialog(BuildContext context, double puntuacion, String mensaje, String descripcion) {
+    String score = puntuacion.toString();
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button to close dialog
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Puntuación: '+score),
+        content:Column(
+          mainAxisSize: MainAxisSize.min,  // para tomar el espacio mínimo necesario
+          children: [
+            Text(
+              mensaje,
+              style: TextStyle(
+                fontSize: 18.0,  // tamaño de la fuente
+                fontFamily: 'Roboto',  // fuente
+                // y otros estilos que desees
+              ),
+            ),
+            SizedBox(height: 20),  // espacio entre los mensajes
+            Text(
+              descripcion,
+              style: TextStyle(
+                fontSize: 18.0,  // tamaño de la fuente
+                fontFamily: 'Roboto',  // fuente
+                // y otros estilos que desees
+              ),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Redirigir'),
+            onPressed: () {
+              Navigator.of(context).pop();  // Cerrar el diálogo
+              navigateToLogin(context);  // Navegar al login
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   // Nueva función para realizar la solicitud POST
   Future<void> _postTestResult(String testResultJson, String uid) async {
@@ -325,15 +399,29 @@ Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
                 ),
                 ...questions[questionIndex].answers.map<Widget>((answer) {
                   return questions[questionIndex].type == 'multiple'
-                      ? CheckboxListTile(
-                          title: Text(answer.text),
-                          value: answer.isSelected,
-                          onChanged: (bool? value) {
+                     ? CheckboxListTile(
+                    title: Text(answer.text),
+                    value: answer.isSelected,
+                    onChanged: (answer.value == 0 || !isZeroSelected) // Permitir cambios si la opción es 0 o si la opción 0 no está seleccionada
+                        ? (bool? value) {
                             setState(() {
                               answer.isSelected = value!;
+                              if (answer.value == 0) {
+                                isZeroSelected = value;
+                              }
+                              // Bloquear o desbloquear otras opciones según el estado de la opción 0
+                              for (var otherAnswer in questions[questionIndex].answers) {
+                                if (otherAnswer.value != 0) {
+                                  if (isZeroSelected) {
+                                    otherAnswer.isSelected = false; // Desmarcar y bloquear
+                                  }
+                                  // Las otras opciones se desbloquean automáticamente al desmarcar la opción 0
+                                }
+                              }
                             });
-                          },
-                        )
+                          }
+                        : null, // Bloquear cambios si la opción 0 está seleccionada
+                  )
                       : RadioListTile<int>(
                           title: Text(answer.text),
                           value: answer.value,
