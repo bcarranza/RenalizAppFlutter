@@ -352,6 +352,8 @@ Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
 }
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return FutureBuilder<List<Question>>(
       future: questionsFuture,
       builder: (context, snapshot) {
@@ -391,12 +393,24 @@ Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
             appBar: AppBar(
               title: Text('Cuestionario'),
             ),
-            body: Column(
-              children: [
-                Text(
-                  questions[questionIndex].question,
-                  style: TextStyle(fontSize: 28),
-                ),
+            body: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Container(
+                    width: size.width,
+                    padding: EdgeInsets.all(16.0),
+                    margin: EdgeInsets.only(bottom: 16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      questions[questionIndex].question,
+                      style: TextStyle(fontSize: 28, color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ...questions[questionIndex].answers.map<Widget>((answer) {
                   return questions[questionIndex].type == 'multiple'
                      ? CheckboxListTile(
@@ -439,9 +453,10 @@ Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
                   onPressed: () => answerQuestion(questions),
                   child: Text('Siguiente'),
                 ),
-              ],
-            ),
-          );
+                ], // Este es el paréntesis de cierre para la lista children
+              ), // Este es el paréntesis de cierre para el widget Column
+            ), // Este es el paréntesis de cierre para el widget Padding
+          ); //
         }
       },
     );
