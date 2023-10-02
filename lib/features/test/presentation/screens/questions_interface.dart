@@ -351,114 +351,133 @@ Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
   print('Historial de tests guardados: $existingTestResults');
 }
   @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+Widget build(BuildContext context) {
+  final size = MediaQuery.of(context).size;
+  final double maxWidth = 1200.0;
 
-    return FutureBuilder<List<Question>>(
-      future: questionsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+  return FutureBuilder<List<Question>>(
+    future: questionsFuture,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Cargando...'),
+          ),
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      } else if (snapshot.hasError) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Error'),
+          ),
+          body: Center(
+            child: Text('Error: ${snapshot.error}'),
+          ),
+        );
+      } else {
+        final questions = snapshot.data!;
+
+        if (questionIndex >= questions.length) {
           return Scaffold(
             appBar: AppBar(
-              title: Text('Cargando...'),
+              title: Text('Cuestionario Completado'),
             ),
             body: Center(
-              child: CircularProgressIndicator(),
+              child: Text('Puntuación: $score'),
             ),
           );
-        } else if (snapshot.hasError) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Error'),
-            ),
-            body: Center(
-              child: Text('Error: ${snapshot.error}'),
-            ),
-          );
-        } else {
-          final questions = snapshot.data!;
-
-          if (questionIndex >= questions.length) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Cuestionario Completado'),
-              ),
-              body: Center(
-                child: Text('Puntuación: $score'),
-              ),
-            );
-          }
-
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Cuestionario'),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Container(
-                    width: size.width,
-                    padding: EdgeInsets.all(16.0),
-                    margin: EdgeInsets.only(bottom: 16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Text(
-                      questions[questionIndex].question,
-                      style: TextStyle(fontSize: 28, color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ...questions[questionIndex].answers.map<Widget>((answer) {
-                  return questions[questionIndex].type == 'multiple'
-                     ? CheckboxListTile(
-                    title: Text(answer.text),
-                    value: answer.isSelected,
-                    onChanged: (answer.value == 0 || !isZeroSelected) // Permitir cambios si la opción es 0 o si la opción 0 no está seleccionada
-                        ? (bool? value) {
-                            setState(() {
-                              answer.isSelected = value!;
-                              if (answer.value == 0) {
-                                isZeroSelected = value;
-                              }
-                              // Bloquear o desbloquear otras opciones según el estado de la opción 0
-                              for (var otherAnswer in questions[questionIndex].answers) {
-                                if (otherAnswer.value != 0) {
-                                  if (isZeroSelected) {
-                                    otherAnswer.isSelected = false; // Desmarcar y bloquear
-                                  }
-                                  // Las otras opciones se desbloquean automáticamente al desmarcar la opción 0
-                                }
-                              }
-                            });
-                          }
-                        : null, // Bloquear cambios si la opción 0 está seleccionada
-                  )
-                      : RadioListTile<int>(
-                          title: Text(answer.text),
-                          value: answer.value,
-                          groupValue: questions[questionIndex].answers.indexWhere((answer) => answer.isSelected),
-                          onChanged: (int? value) {
-                            setState(() {
-                              for (var ans in questions[questionIndex].answers) {
-                                ans.isSelected = ans.value == value;
-                              }
-                            });
-                          },
-                        );
-                }).toList(),
-                ElevatedButton(
-                  onPressed: () => answerQuestion(questions),
-                  child: Text('Siguiente'),
-                ),
-                ], // Este es el paréntesis de cierre para la lista children
-              ), // Este es el paréntesis de cierre para el widget Column
-            ), // Este es el paréntesis de cierre para el widget Padding
-          ); //
         }
-      },
-    );
-  }
+
+        var isAnswerSelected = questions[questionIndex].answers.any((answer) => answer.isSelected);
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Cuestionario'),
+          ),
+          body: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: size.width,
+                      padding: EdgeInsets.all(16.0),
+                      margin: EdgeInsets.only(bottom: 16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Text(
+                        questions[questionIndex].question,
+                        style: TextStyle(fontSize: 28, color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    ...questions[questionIndex].answers.map<Widget>((answer) {
+                      return questions[questionIndex].type == 'multiple'
+                          ? CheckboxListTile(
+                              title: Text(answer.text),
+                              value: answer.isSelected,
+                              onChanged: (answer.value == 0 || !isZeroSelected)
+                                  ? (bool? value) {
+                                      setState(() {
+                                        answer.isSelected = value!;
+                                        if (answer.value == 0) {
+                                          isZeroSelected = value;
+                                        }
+                                        for (var otherAnswer in questions[questionIndex].answers) {
+                                          if (otherAnswer.value != 0) {
+                                            if (isZeroSelected) {
+                                              otherAnswer.isSelected = false;
+                                            }
+                                          }
+                                        }
+                                      });
+                                    }
+                                  : null,
+                            )
+                          : RadioListTile<int>(
+                              title: Text(answer.text),
+                              value: answer.value,
+                              groupValue: questions[questionIndex].answers.indexWhere((answer) => answer.isSelected),
+                              onChanged: (int? value) {
+                                setState(() {
+                                  for (var ans in questions[questionIndex].answers) {
+                                    ans.isSelected = ans.value == value;
+                                  }
+                                });
+                              },
+                            );
+                    }).toList(),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isAnswerSelected ? () => answerQuestion(questions) : null,
+                        child: Text('Siguiente'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor : Colors.blue,
+                          foregroundColor : Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    },
+  );
+}
+
+
+
+  
 }
