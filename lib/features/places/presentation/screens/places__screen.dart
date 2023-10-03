@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:renalizapp/features/shared/widgets/navigation/appBar/custom_app_bar.dart';
+
+import '../widgets/widgets.dart';
 
 class PlacesScreen extends StatelessWidget {
   /// Creates a RootScreen
@@ -13,22 +14,9 @@ class PlacesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       appBar: CustomAppBar(),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text('Estoy en Places',
-                style: Theme.of(context).textTheme.titleLarge),
-            const Padding(padding: EdgeInsets.all(4)),
-            TextButton(
-              onPressed: () => context.go(subPath),
-              child: const Text('Moverse a ruta hija'),
-            ),
-          ],
-        ),
-      ),
+      body: PlacesList(),
     );
   }
 }
