@@ -322,7 +322,7 @@ class _QuizzPageState extends State<QuizzPage> {
     }
 
     await prefs.setStringList('history', existingResults);
-    print('Historial de tests para USUARIO: $existingResults');
+    //print('Historial de tests para USUARIO: $existingResults');
   }
 
   // Función para guardar el resultado del test en SharedPreferences
@@ -346,6 +346,17 @@ class _QuizzPageState extends State<QuizzPage> {
     // Imprime la lista actualizada de resultados de test
     print('Historial de tests guardados: $existingTestResults');
   }
+
+  
+  // Agrega el nuevo resultado a la lista existente
+  existingTestResults.add(testResultJson);
+  
+  // Guarda la lista actualizada de resultados de test
+  await prefs.setStringList('historyTests', existingTestResults);
+  
+  // Imprime la lista actualizada de resultados de test
+ // print('Historial de tests guardados: $existingTestResults');
+}
 
   @override
   Widget build(BuildContext context) {

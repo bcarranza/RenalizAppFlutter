@@ -89,7 +89,7 @@ class _PerfilFileState extends State<PerfilFile> {
                       } else {
                         final userData = snapshot.data as Map<String, dynamic>;
                         final user = userData['user'] as Map<String, dynamic>;
-                        print(user);
+                        //print(user);
                         // Verificar si los campos son nulos antes de acceder a ellos
                         String userFirstName = user['First_Name'] ?? '';
                         String userLastName = user['Last_Name'] ?? '';
