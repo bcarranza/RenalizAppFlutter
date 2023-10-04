@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class PerfilFile extends StatefulWidget {
   @override
@@ -17,14 +18,13 @@ class PerfilFile extends StatefulWidget {
 
 class _PerfilFileState extends State<PerfilFile> {
   Future<Map<String, dynamic>> getUserData(String uid) async {
-    final url =
-        'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-getUserByUid';
+    final Uri uri = Uri.parse(dotenv.env['API_URL']! + 'getUserByUid');
 
     final body = {
       "uid": uid,
     };
 
-    final response = await http.post(Uri.parse(url), body: body);
+    final response = await http.post(uri, body: body);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> userData = json.decode(response.body);

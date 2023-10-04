@@ -5,6 +5,7 @@ import 'package:renalizapp/features/home/home.dart';
 import 'package:renalizapp/features/home/presentation/screens/blog_detail.dart';
 import 'package:renalizapp/features/test/presentation/screens/history_page.dart';
 import 'package:renalizapp/features/test/presentation/screens/login_screen.dart';
+import 'package:renalizapp/features/test/presentation/screens/mentions_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
 import 'package:renalizapp/features/test/presentation/screens/perfil_file.dart';
 import 'package:renalizapp/features/test/presentation/screens/questions_interface.dart';
@@ -83,6 +84,13 @@ final appRouter =
               path: '/profile',
               pageBuilder: (context, state) =>
                   NoTransitionPage(child: PerfilFile()),
+            ),
+            GoRoute(
+              path: '/mentions',
+              pageBuilder: (context, state) => NoTransitionPage(
+                  child: EquipoPage(
+                appRouter: GoRouter.of(context),
+              )),
             ),
           ],
         ),
