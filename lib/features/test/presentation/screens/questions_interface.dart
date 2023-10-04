@@ -324,7 +324,7 @@ Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
     }
 
     await prefs.setStringList('history', existingResults);
-    print('Historial de tests para USUARIO: $existingResults');
+    //print('Historial de tests para USUARIO: $existingResults');
   }
 
 
@@ -348,7 +348,7 @@ Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
   await prefs.setStringList('historyTests', existingTestResults);
   
   // Imprime la lista actualizada de resultados de test
-  print('Historial de tests guardados: $existingTestResults');
+ // print('Historial de tests guardados: $existingTestResults');
 }
   @override
 Widget build(BuildContext context) {
