@@ -87,13 +87,21 @@ final appRouter =
           ],
         ),
 
-        //Chat branch
-        StatefulShellBranch(navigatorKey: _shellNavigatorHelpCenterKey, routes: [
+        //helpcenter branch
+       StatefulShellBranch(navigatorKey: _shellNavigatorHelpCenterKey, routes: [
+      GoRoute(
+        path: '/helpcenters',
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: PlacesScreen(subPath: '/chat/1')),
+        routes: [
+          // Agrega una subruta a la rama "helpcenter"
           GoRoute(
-            path: '/helpcenters',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: PlacesScreen(subPath: '/chat/1')),
-          )
-        ]),
+              path: 'detailCenter',
+              pageBuilder: (context, state) =>
+                  NoTransitionPage(child: PerfilFile()),
+            ),
+        ],
+      ),
+    ])
       ])
 ]);
