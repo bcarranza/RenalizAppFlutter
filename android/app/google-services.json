@@ -14,14 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "937615289579-kid3cetpmv5hrdojo9em9d2o0nn3f30k.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "app.dportillo.renalizapp",
-            "certificate_hash": "9dea1dfb4f26975a59066d3849f4943364870470"
-          }
-        },
-        {
           "client_id": "937615289579-49v5e34783gtfgsvhrmvvf9upv19d2n6.apps.googleusercontent.com",
           "client_type": 3
         }
