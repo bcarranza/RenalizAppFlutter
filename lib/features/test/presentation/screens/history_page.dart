@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
+import 'dart:convert';
 
 class HistoryPage extends StatefulWidget {
   final GoRouter appRouter;
@@ -16,7 +19,41 @@ class _HistoryPageState extends State<HistoryPage> {
   List<String> history = [];
 
   // Carga el historial desde SharedPreferences
-  Future<void> loadHistory() async {
+ Future<void> loadHistory() async {
+  final authProvider = context.read<AuthProvider>();
+  String? uid = authProvider.currentUser?.uid;
+  print(uid);
+
+  if (uid != null) {
+    print("Se ha iniciado sesion");
+    // Usuario ha iniciado sesión
+    final response = await http.post(
+      Uri.parse('https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-dev-getTestsByUid'),
+      body: json.encode({'uid': uid}),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final String formattedResult = data['formattedResult'];
+      print(formattedResult);
+
+      // Dividir formattedResult en una lista de cadenas
+      final List<String> historyItems = formattedResult.split(', ');
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('history', historyItems);
+
+      setState(() {
+        history = historyItems;
+      });
+      print(prefs);
+    } else {
+      // Manejar error en la respuesta
+    }
+  } else {
+    print("NO se ha iniciado sesion");
+    // Usuario no ha iniciado sesión
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? savedHistory = prefs.getStringList('history');
     if (savedHistory != null) {
@@ -24,8 +61,9 @@ class _HistoryPageState extends State<HistoryPage> {
         history = savedHistory;
       });
     }
-    //print('Historial cargado: $history'); // Agregar este print
   }
+}
+
 
   @override
   void initState() {
