@@ -42,7 +42,7 @@ Future<void> postStoredTests() async {
 
   // Obtener la lista de tests almacenados
   List<String>? storedTests = prefs.getStringList('historyTests');
-  print(storedTests);
+  //print(storedTests);
   // Verificar si hay tests almacenados
   if (storedTests == null || storedTests.isEmpty) {
     print('No hay tests almacenados en el caché.');
