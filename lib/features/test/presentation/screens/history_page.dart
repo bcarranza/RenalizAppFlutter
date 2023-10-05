@@ -24,7 +24,7 @@ class _HistoryPageState extends State<HistoryPage> {
         history = savedHistory;
       });
     }
-    print('Historial cargado: $history'); // Agregar este print
+    //print('Historial cargado: $history'); // Agregar este print
   }
 
   @override

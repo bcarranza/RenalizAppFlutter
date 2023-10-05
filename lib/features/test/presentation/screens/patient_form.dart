@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/data.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class PatientForm extends StatefulWidget {
   final GoRouter appRouter;
@@ -65,8 +66,7 @@ class _PatientFormState extends State<PatientForm> {
       final idTokenResult = await user?.getIdTokenResult();
       final token = idTokenResult?.token;
 
-      final uri = Uri.parse(
-          'https://us-central1-renalizapp-dev-2023-396503.cloudfunctions.net/renalizapp-2023-prod-postRegister');
+      final Uri uri = Uri.parse(dotenv.env['API_URL']! + 'postRegister');
 
       final response = await http.post(uri, body: body);
 
@@ -74,7 +74,6 @@ class _PatientFormState extends State<PatientForm> {
         return response.statusCode;
       } else {
         // Puedes manejar el error aquí si lo deseas, por ejemplo, imprimir los valores del cuerpo (body).
-        print(body);
         throw Exception('Error: ${response.statusCode}');
       }
     } catch (e) {
