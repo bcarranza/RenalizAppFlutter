@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:renalizapp/features/chat/chat.dart';
 import 'package:renalizapp/features/home/home.dart';
+import 'package:renalizapp/features/places/places.dart';
 import 'package:renalizapp/features/home/presentation/screens/blog_detail.dart';
 import 'package:renalizapp/features/test/presentation/screens/history_page.dart';
 import 'package:renalizapp/features/test/presentation/screens/login_screen.dart';
@@ -19,8 +19,8 @@ final _shellNavigatorHomeKey =
     GlobalKey<NavigatorState>(debugLabel: 'shellHome');
 final _shellNavigatorTestKey =
     GlobalKey<NavigatorState>(debugLabel: 'shellTest');
-final _shellNavigatorChattKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shellChat');
+final _shellNavigatorHelpCenterKey =
+    GlobalKey<NavigatorState>(debugLabel: 'shellHelpCenter');
 
 final appRouter =
     GoRouter(initialLocation: '/', navigatorKey: _rootNavigatorKey, routes: [
@@ -95,13 +95,26 @@ final appRouter =
           ],
         ),
 
-        //Chat branch
-        StatefulShellBranch(navigatorKey: _shellNavigatorChattKey, routes: [
+        //helpcenter branch
+       StatefulShellBranch(navigatorKey: _shellNavigatorHelpCenterKey, routes: [
+        GoRoute(
+        path: '/helpcenters',
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: PlacesScreen(subPath: '/chat/1')),
+        routes: [
+          // Agrega una subruta a la rama "helpcenter"
           GoRoute(
-            path: '/chat',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: ChatScreen(subPath: '/chat/1')),
-          )
-        ]),
+            path: 'detailCenter/:uid',
+            name:"PlaceDetail",
+            builder: (context, state) {
+              final Map<String, String> params = state.pathParameters;
+              return PlaceDetailScreen(
+                uid: params['uid'],
+              );
+            },
+          ),
+        ],
+      ),
+    ])
       ])
 ]);
