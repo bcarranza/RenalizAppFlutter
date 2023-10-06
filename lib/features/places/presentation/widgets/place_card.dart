@@ -1,17 +1,19 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:maps_launcher/maps_launcher.dart';
+import 'package:renalizapp/features/places/domain/domain.dart';
 
 import 'inner_shadow.dart';
 
 class PlaceCard extends StatelessWidget {
-  final String photoUrl;
-  final String title;
-  final String description;
 
-  PlaceCard({
-    required this.photoUrl,
-    required this.title,
-    required this.description,
+  final Place place;
+
+
+  const PlaceCard({super.key, 
+    required this.place,
   });
 
   @override
@@ -30,14 +32,15 @@ class PlaceCard extends StatelessWidget {
             child: GestureDetector(
               onTap: () {
                 // Acción a realizar cuando se presiona la Sección 1
-                // Por ejemplo, puedes mostrar un mensaje o realizar alguna otra acción.
-                print("card");
-                context.go('/helpcenters/detailCenter');
+                 final params = {
+                'uid': place.uid,
+                    };
+               context.goNamed("PlaceDetail",pathParameters: params);
               },
               child: InnerShadow( // Envuelve el contenedor interno con InnerShadow
                 blur: 10,
                 color: Colors.black38,
-                offset: Offset(10, 10),
+                offset: const Offset(10, 10),
                 child: Container(
                   height: isMobile ? 100 : 200,
                   decoration: BoxDecoration(
@@ -46,7 +49,7 @@ class PlaceCard extends StatelessWidget {
                       bottomLeft: Radius.circular(10.0),
                     ),
                     image: DecorationImage(
-                      image: NetworkImage(photoUrl),
+                      image: NetworkImage(place.photoUrl),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -56,7 +59,9 @@ class PlaceCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Text(
-                          title,
+                          place.nombre,
+                           maxLines: 1, 
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: isMobile ? 18 : 38,
                             fontWeight: FontWeight.bold,
@@ -74,7 +79,9 @@ class PlaceCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Text(
-                          description,
+                          place.descripcion,
+                          maxLines: 1, 
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: isMobile ? 12 : 24,
                            shadows: const <Shadow>[
@@ -96,9 +103,7 @@ class PlaceCard extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              // Acción a realizar cuando se presiona la Sección 2
-              // Por ejemplo, puedes navegar a una pantalla de detalles o realizar alguna otra acción.
-              print("hola");
+             MapsLauncher.launchCoordinates(place.latitud, place.longitud);
             },
             child: Container(
               height: isMobile ? 100 : 200,
@@ -110,7 +115,7 @@ class PlaceCard extends StatelessWidget {
                 ),
                 color: mainColor,
               ),
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -119,7 +124,7 @@ class PlaceCard extends StatelessWidget {
                     color: Colors.white,
                     size: isMobile ? 24 : 32,
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                 
                 ],
               ),

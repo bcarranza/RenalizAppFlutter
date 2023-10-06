@@ -89,17 +89,22 @@ final appRouter =
 
         //helpcenter branch
        StatefulShellBranch(navigatorKey: _shellNavigatorHelpCenterKey, routes: [
-      GoRoute(
+        GoRoute(
         path: '/helpcenters',
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: PlacesScreen(subPath: '/chat/1')),
         routes: [
           // Agrega una subruta a la rama "helpcenter"
           GoRoute(
-              path: 'detailCenter',
-              pageBuilder: (context, state) =>
-                  NoTransitionPage(child: PerfilFile()),
-            ),
+            path: 'detailCenter/:uid',
+            name:"PlaceDetail",
+            builder: (context, state) {
+              final Map<String, String> params = state.pathParameters;
+              return PlaceDetailScreen(
+                uid: params['uid'],
+              );
+            },
+          ),
         ],
       ),
     ])
