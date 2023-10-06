@@ -63,6 +63,13 @@ class TestScreen extends StatelessWidget {
                 context.go('/test/historial');
               },
               child: Text('¿Quieres ver tu historial?'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.go('/mentions');
+              },
+              child: Text(
+                  'Menciones honorificas (Este botón está de prueba, luego se quitará)'),
             )
           ],
         ),

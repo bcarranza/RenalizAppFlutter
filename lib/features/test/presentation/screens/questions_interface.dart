@@ -11,6 +11,7 @@ import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
+
 class Question {
   final String question;
   final String type;
@@ -186,7 +187,6 @@ class _QuizzPageState extends State<QuizzPage> {
       String riskMessage;
       String riskDescription;
 
-      String? userName = authProvider.currentUser?.displayName;
       String? uid = authProvider.currentUser?.uid;
 
       if (uid != null) {
@@ -324,7 +324,7 @@ Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
     }
 
     await prefs.setStringList('history', existingResults);
-    print('Historial de tests para USUARIO: $existingResults');
+    //print('Historial de tests para USUARIO: $existingResults');
   }
 
 
@@ -348,7 +348,7 @@ Future<void> _saveToHistory(String riskMessage, String riskDescription) async {
   await prefs.setStringList('historyTests', existingTestResults);
   
   // Imprime la lista actualizada de resultados de test
-  print('Historial de tests guardados: $existingTestResults');
+ // print('Historial de tests guardados: $existingTestResults');
 }
   @override
 Widget build(BuildContext context) {
@@ -475,9 +475,5 @@ Widget build(BuildContext context) {
       }
     },
   );
-}
-
-
-
-  
+}  
 }
