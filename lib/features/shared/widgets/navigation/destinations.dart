@@ -10,5 +10,5 @@ class Destination {
 const List<Destination> destinations = <Destination>[
   Destination(Icons.home_outlined, 'Inicio'),
   Destination(FontAwesomeIcons.flask, 'Examen'),
-  Destination(Icons.messenger_outline_rounded, 'Chat'),
+  Destination(Icons.local_hospital_outlined, 'Centros'),
 ];

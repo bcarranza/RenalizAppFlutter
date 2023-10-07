@@ -189,7 +189,6 @@ class _QuizzPageState extends State<QuizzPage> {
       String riskMessage;
       String riskDescription;
 
-      String? userName = authProvider.currentUser?.displayName;
       String? uid = authProvider.currentUser?.uid;
 
       if (uid != null) {

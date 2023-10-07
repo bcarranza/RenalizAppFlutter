@@ -84,6 +84,8 @@ class _MainListState extends State<MainList> {
 
   @override
   Widget build(BuildContext context) {
+    double txtScale = MediaQuery.of(context).textScaleFactor;
+
     _scrollController.addListener(() async {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
@@ -153,18 +155,24 @@ class _MainListState extends State<MainList> {
                                       backgroundImage: NetworkImage(
                                         blog['cover_image'],
                                       ),
+                                      radius: 40,
                                     ),
                                     title: Text(
                                       blog['title'],
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20.0 * txtScale),
                                     ),
                                     subtitle: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(blog['category']),
-                                        Text("Autor: ${blog['author']}"),
+                                        Text(blog['category'],
+                                            style: TextStyle(
+                                                fontSize: 16.0 * txtScale)),
+                                        Text("Autor: ${blog['author']}",
+                                            style: TextStyle(
+                                                fontSize: 16.0 * txtScale)),
                                         Text(
                                             DateTime.fromMicrosecondsSinceEpoch(
                                                     blog['publication_date']
@@ -173,10 +181,10 @@ class _MainListState extends State<MainList> {
                                                 .toLocal()
                                                 .toString()
                                                 .split('.')[0]),
-                                        Text(
-                                          blog['description'],
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        Text(blog['description'],
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontSize: 18.0 * txtScale)),
                                         displayedTags.isNotEmpty
                                             ? SizedBox(height: 20)
                                             : Container(),
@@ -213,18 +221,12 @@ class _MainListState extends State<MainList> {
                                             : SizedBox()
                                       ],
                                     ),
-                                    trailing: IconButton(
-                                      icon: Icon(
-                                        Icons.star,
-                                        color: blog['isStarred']
-                                            ? Colors.yellow
-                                            : Colors
-                                                .grey, // Color de la estrella según el valor de isEstrellado
-                                      ),
-                                      onPressed: () {
-                                        // Maneja la acción cuando se hace clic en la estrella aquí
-                                        // Puedes agregar lógica para cambiar el valor de isEstrellado
-                                      },
+                                    trailing: Icon(
+                                      Icons.star,
+                                      color: blog['isStarred']
+                                          ? Colors.yellow
+                                          : Colors
+                                              .grey, // Color de la estrella según el valor de isEstrellado
                                     ),
                                   ),
                                 ));
