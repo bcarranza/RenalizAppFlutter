@@ -8,8 +8,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-
-
 class PerfilFile extends StatefulWidget {
   @override
   _PerfilFileState createState() => _PerfilFileState();
@@ -33,66 +31,61 @@ class _PerfilFileState extends State<PerfilFile> {
     }
   }
 
+  Future<void> postStoredTests() async {
+    // Obtener la instancia de SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-
-
-Future<void> postStoredTests() async {
-  // Obtener la instancia de SharedPreferences
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  // Obtener la lista de tests almacenados
-  List<String>? storedTests = prefs.getStringList('historyTests');
-  //print(storedTests);
-  // Verificar si hay tests almacenados
-  if (storedTests == null || storedTests.isEmpty) {
-    print('No hay tests almacenados en el caché.');
-    return;  // Terminar la función si no hay tests almacenados
-  }
-
-  // Obtener el uid del usuario actual
-  final authProvider = context.read<AuthProvider>();
-  String? uid = authProvider.currentUser?.uid;
-  if (uid == null) {
-    print('No se pudo obtener el uid del usuario.');
-    return;  // Terminar la función si no se pudo obtener el uid
-  }
-
-  // Crear la URI para la solicitud POST
-  final Uri uri = Uri.parse(dotenv.env['API_URL']! + 'postTestResults');
-
-  for (int i = 0; i < storedTests.length; i++) {
-    // Decodificar el test actual a un objeto Dart
-    var testResult = jsonDecode(storedTests[i]);
-
-    // Enviar la solicitud POST
-    final response = await http.post(
-      uri,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'uid': uid,
-        'testResult': testResult,
-      }),
-    );
-
-    // Verificar la respuesta
-    if (response.statusCode == 200) {
-      print('Test result posted successfully: ${response.body}');
-      // Eliminar el test posteado exitosamente de la lista
-      storedTests.removeAt(i);
-      // Decrementar el índice ya que acabamos de eliminar un elemento
-      i--;
-    } else {
-      print('Failed to post test result: ${response.statusCode}');
+    // Obtener la lista de tests almacenados
+    List<String>? storedTests = prefs.getStringList('historyTests');
+    //print(storedTests);
+    // Verificar si hay tests almacenados
+    if (storedTests == null || storedTests.isEmpty) {
+      print('No hay tests almacenados en el caché.');
+      return; // Terminar la función si no hay tests almacenados
     }
+
+    // Obtener el uid del usuario actual
+    final authProvider = context.read<AuthProvider>();
+    String? uid = authProvider.currentUser?.uid;
+    if (uid == null) {
+      print('No se pudo obtener el uid del usuario.');
+      return; // Terminar la función si no se pudo obtener el uid
+    }
+
+    // Crear la URI para la solicitud POST
+    final Uri uri = Uri.parse(dotenv.env['API_URL']! + 'postTestResults');
+
+    for (int i = 0; i < storedTests.length; i++) {
+      // Decodificar el test actual a un objeto Dart
+      var testResult = jsonDecode(storedTests[i]);
+
+      // Enviar la solicitud POST
+      final response = await http.post(
+        uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'uid': uid,
+          'testResult': testResult,
+        }),
+      );
+
+      // Verificar la respuesta
+      if (response.statusCode == 200) {
+        print('Test result posted successfully: ${response.body}');
+        // Eliminar el test posteado exitosamente de la lista
+        storedTests.removeAt(i);
+        // Decrementar el índice ya que acabamos de eliminar un elemento
+        i--;
+      } else {
+        print('Failed to post test result: ${response.statusCode}');
+      }
+    }
+
+    // Guardar la lista modificada de nuevo en SharedPreferences
+    await prefs.setStringList('historyTests', storedTests);
   }
-
-  // Guardar la lista modificada de nuevo en SharedPreferences
-  await prefs.setStringList('historyTests', storedTests);
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +142,6 @@ Future<void> postStoredTests() async {
                         final userData = snapshot.data as Map<String, dynamic>;
                         final user = userData['user'] as Map<String, dynamic>;
 
-                        
                         postStoredTests();
                         //print(user);
                         // Verificar si los campos son nulos antes de acceder a ellos
