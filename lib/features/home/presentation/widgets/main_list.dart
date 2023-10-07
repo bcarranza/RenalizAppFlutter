@@ -221,18 +221,12 @@ class _MainListState extends State<MainList> {
                                             : SizedBox()
                                       ],
                                     ),
-                                    trailing: IconButton(
-                                      icon: Icon(
-                                        Icons.star,
-                                        color: blog['isStarred']
-                                            ? Colors.yellow
-                                            : Colors
-                                                .grey, // Color de la estrella según el valor de isEstrellado
-                                      ),
-                                      onPressed: () {
-                                        // Maneja la acción cuando se hace clic en la estrella aquí
-                                        // Puedes agregar lógica para cambiar el valor de isEstrellado
-                                      },
+                                    trailing: Icon(
+                                      Icons.star,
+                                      color: blog['isStarred']
+                                          ? Colors.yellow
+                                          : Colors
+                                              .grey, // Color de la estrella según el valor de isEstrellado
                                     ),
                                   ),
                                 ));
