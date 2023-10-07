@@ -16,6 +16,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         final isUserLoggedIn = authProvider.currentUser != null;
 
         return AppBar(
+          leading: GestureDetector(
+            onTap: () {
+              GoRouter.of(context).go('/mentions');
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
+                'assets/renalizapp_icon_noText.png',
+                width: 32,
+                height: 32,
+              ),
+            ),
+          ),
           title: AnimatedDefaultTextStyle(
             duration: const Duration(seconds: 1),
             curve: Curves.easeInOut,
