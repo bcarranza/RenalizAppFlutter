@@ -40,7 +40,7 @@ class _EquipoPageState extends State<EquipoPage> {
 
   int _currentIndex = 0;
   List<String> listaDeIds = [
-    'SB1OXSbDDvULECoVJNy8',
+    'FJPkMhS8cHbERBsfVMV0',
   ];
 
   _EquipoPageState() {
@@ -66,7 +66,7 @@ class _EquipoPageState extends State<EquipoPage> {
           Empleado(
             nombre: data['name'].toString(),
             cargo: data['Role'].toString(),
-            foto: data['photo'].toString(),
+            foto: data['foto'].toString(),
             correo: data['email'].toString(),
             telefono: data['Number_phone'].toString(),
             descripcion: data['description'].toString(),
@@ -179,6 +179,8 @@ class _EquipoPageState extends State<EquipoPage> {
               children: [
                 Text(
                   empleado.nombre,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
