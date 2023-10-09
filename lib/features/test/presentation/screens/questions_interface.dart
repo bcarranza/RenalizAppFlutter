@@ -346,6 +346,8 @@ class _QuizzPageState extends State<QuizzPage> {
     // print('Historial de tests guardados: $existingTestResults');
   }
 
+  final Map<int, int> selectedAnswers = {};
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -453,11 +455,10 @@ class _QuizzPageState extends State<QuizzPage> {
                             : RadioListTile<int>(
                                 title: Text(answer.text),
                                 value: answer.value,
-                                groupValue: questions[questionIndex]
-                                    .answers
-                                    .indexWhere((answer) => answer.isSelected),
+                               groupValue: selectedAnswers[questionIndex],
                                 onChanged: (int? value) {
                                   setState(() {
+                                    selectedAnswers[questionIndex] = value!;
                                     for (var ans
                                         in questions[questionIndex].answers) {
                                       ans.isSelected = ans.value == value;
