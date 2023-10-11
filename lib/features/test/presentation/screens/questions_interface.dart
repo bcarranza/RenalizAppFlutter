@@ -94,6 +94,113 @@ class QuizzPage extends StatefulWidget {
 }
 
 class _QuizzPageState extends State<QuizzPage> {
+
+
+
+
+
+
+
+Future<void> _sendFeedback(String uid, bool willVisitDoctor) async {
+    final String? apiUrl = dotenv.env['API_URL'];
+
+    if (apiUrl == null) {
+      print("Error: No se pudo obtener la configuración de .env");
+      return;
+    }
+
+    final Uri uri = Uri.parse(apiUrl + 'postFeedback');  // Utiliza dotenv para obtener la URL
+
+    final response = await http.post(
+      uri,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'uid': uid,
+        'willVisitDoctor': willVisitDoctor,
+        'appRating': 5,
+        'comments': "no coments",
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Feedback sent successfully: ${response.body}');
+    } else {
+      print('Failed to send feedback: ${response.statusCode}');
+    }
+}
+
+
+
+
+
+Future<void> _showDoctorVisitDialog(double score, String riskMessage, String riskDescription) async {
+    final authProvider = context.read<AuthProvider>();  
+    String? uid = authProvider.currentUser?.uid;
+
+    if (uid != null) {  // Verifica que el uid no sea nulo
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Puntuación: $score'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(riskMessage),
+                Text(riskDescription),
+                SizedBox(height: 20),
+                Text("¿Piensa ir al doctor después de ver los resultados de su test?"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _sendFeedback(uid, true);  // Enviar respuesta de que SÍ irá al doctor
+                      },
+                      child: Text('Sí'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _sendFeedback(uid, false);  // Enviar respuesta de que NO irá al doctor
+                      },
+                      child: Text('No'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } else {  // Si el uid es nulo, se puede mostrar un mensaje o realizar otra acción según lo desees.
+      print("El usuario no ha iniciado sesión.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   bool isZeroSelected = false;
   late Future<List<Question>> questionsFuture;
   int questionIndex = 0;
@@ -206,7 +313,8 @@ class _QuizzPageState extends State<QuizzPage> {
         }
         _postTestResult(response1, uid);
         _saveToHistory(riskMessage, riskDescription);
-        showRedirectDialog(context, score, riskMessage, riskDescription);
+        //showRedirectDialog(context, score, riskMessage, riskDescription);
+        _showDoctorVisitDialog(score, riskMessage, riskDescription);
       } else {
         if (score >= 0 && score <= 4) {
           riskMessage = "Buenas prácticas para la salud renal.";
@@ -222,8 +330,7 @@ class _QuizzPageState extends State<QuizzPage> {
         }
 
         _saveTestResult(response1);
-        _saveToHistory(
-            riskMessage, riskDescription); // Llamada al nuevo método aquí
+        _saveToHistory(riskMessage, riskDescription); // Llamada al nuevo método aquí
         showRedirectDialog(context, score, riskMessage, riskDescription);
       }
     }
