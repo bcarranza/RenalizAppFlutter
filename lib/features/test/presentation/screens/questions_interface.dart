@@ -98,7 +98,9 @@ class QuizzPage extends StatefulWidget {
 class _QuizzPageState extends State<QuizzPage> {
 
 
+
 Future<void> _sendFeedback(String uid, bool? willVisitDoctor, int appRating, String comments) async {
+
     final String? apiUrl = dotenv.env['API_URL'];
 
     if (apiUrl == null) {
@@ -106,8 +108,8 @@ Future<void> _sendFeedback(String uid, bool? willVisitDoctor, int appRating, Str
       return;
     }
 
-    final Uri uri = Uri.parse(apiUrl + 'postFeedback');
 
+    final Uri uri = Uri.parse(apiUrl + 'postFeedback');
     final response = await http.post(
       uri,
       headers: <String, String>{
@@ -132,6 +134,7 @@ Future<void> _showDoctorVisitDialog(double score, String riskMessage, String ris
     final authProvider = context.read<AuthProvider>();  
     String? uid = authProvider.currentUser?.uid;
 
+
     if (uid != null) {
       return showDialog<void>(
         context: context,
@@ -153,6 +156,7 @@ Future<void> _showDoctorVisitDialog(double score, String riskMessage, String ris
                       onPressed: () {
                         Navigator.of(context).pop();
                         _showAppRatingDialog(uid, true);  // Muestra el siguiente diálogo para calificar la app
+
                       },
                       child: Text('Sí'),
                     ),
@@ -160,6 +164,7 @@ Future<void> _showDoctorVisitDialog(double score, String riskMessage, String ris
                       onPressed: () {
                         Navigator.of(context).pop();
                         _showAppRatingDialog(uid, false);  // Muestra el siguiente diálogo para calificar la app
+
                       },
                       child: Text('No'),
                     ),
@@ -170,6 +175,7 @@ Future<void> _showDoctorVisitDialog(double score, String riskMessage, String ris
           );
         },
       );
+
     } else {
       print("El usuario no ha iniciado sesión.");
     }
@@ -233,6 +239,7 @@ Future<void> _showAppRatingDialog(String uid, bool willVisitDoctor) async {
         },
       );
 }
+
 
 
 
