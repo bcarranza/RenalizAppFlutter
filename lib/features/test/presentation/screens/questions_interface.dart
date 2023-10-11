@@ -9,6 +9,8 @@ import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+
 
 class Question {
   final String question;
@@ -96,12 +98,7 @@ class QuizzPage extends StatefulWidget {
 class _QuizzPageState extends State<QuizzPage> {
 
 
-
-
-
-
-
-Future<void> _sendFeedback(String uid, bool willVisitDoctor) async {
+Future<void> _sendFeedback(String uid, bool? willVisitDoctor, int appRating, String comments) async {
     final String? apiUrl = dotenv.env['API_URL'];
 
     if (apiUrl == null) {
@@ -109,7 +106,7 @@ Future<void> _sendFeedback(String uid, bool willVisitDoctor) async {
       return;
     }
 
-    final Uri uri = Uri.parse(apiUrl + 'postFeedback');  // Utiliza dotenv para obtener la URL
+    final Uri uri = Uri.parse(apiUrl + 'postFeedback');
 
     final response = await http.post(
       uri,
@@ -119,8 +116,8 @@ Future<void> _sendFeedback(String uid, bool willVisitDoctor) async {
       body: jsonEncode(<String, dynamic>{
         'uid': uid,
         'willVisitDoctor': willVisitDoctor,
-        'appRating': 5,
-        'comments': "no coments",
+        'appRating': appRating,
+        'comments': comments,
       }),
     );
 
@@ -131,15 +128,11 @@ Future<void> _sendFeedback(String uid, bool willVisitDoctor) async {
     }
 }
 
-
-
-
-
 Future<void> _showDoctorVisitDialog(double score, String riskMessage, String riskDescription) async {
     final authProvider = context.read<AuthProvider>();  
     String? uid = authProvider.currentUser?.uid;
 
-    if (uid != null) {  // Verifica que el uid no sea nulo
+    if (uid != null) {
       return showDialog<void>(
         context: context,
         barrierDismissible: false,
@@ -159,14 +152,14 @@ Future<void> _showDoctorVisitDialog(double score, String riskMessage, String ris
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        _sendFeedback(uid, true);  // Enviar respuesta de que SÍ irá al doctor
+                        _showAppRatingDialog(uid, true);  // Muestra el siguiente diálogo para calificar la app
                       },
                       child: Text('Sí'),
                     ),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        _sendFeedback(uid, false);  // Enviar respuesta de que NO irá al doctor
+                        _showAppRatingDialog(uid, false);  // Muestra el siguiente diálogo para calificar la app
                       },
                       child: Text('No'),
                     ),
@@ -177,19 +170,69 @@ Future<void> _showDoctorVisitDialog(double score, String riskMessage, String ris
           );
         },
       );
-    } else {  // Si el uid es nulo, se puede mostrar un mensaje o realizar otra acción según lo desees.
+    } else {
       print("El usuario no ha iniciado sesión.");
     }
 }
+Future<void> _showAppRatingDialog(String uid, bool willVisitDoctor) async {
+    double currentRating = 3.0;  // Valor inicial para mostrar
+    TextEditingController commentsController = TextEditingController();
 
-
-
-
-
-
-
-
-
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Califica nuestra aplicación'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RatingBar.builder(
+                    initialRating: currentRating,
+                    minRating: 1,
+                    direction: Axis.horizontal,
+                    allowHalfRating: true,
+                    itemCount: 5,
+                    itemSize: 30.0,
+                    itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                    ),
+                    onRatingUpdate: (rating) {
+                        currentRating = rating;
+                    },
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: commentsController,
+                  decoration: InputDecoration(
+                    labelText: 'Comentarios',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Saltar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _sendFeedback(uid, willVisitDoctor, -1, "NO COMMENTS");  // Usamos -1 para indicar que se saltó
+                },
+              ),
+              TextButton(
+                child: Text('Enviar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _sendFeedback(uid, willVisitDoctor, currentRating.toInt(), commentsController.text);
+                },
+              ),
+            ],
+          );
+        },
+      );
+}
 
 
 
