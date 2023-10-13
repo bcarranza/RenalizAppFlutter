@@ -262,7 +262,7 @@ class _PerfilFileState extends State<PerfilFile> {
         ),
         subtitle: GestureDetector(
           onTap: () {
-            launch("mailto://${subtitle}");
+            launch("mailto:${subtitle}");
           },
           child: Text(
             subtitle,
