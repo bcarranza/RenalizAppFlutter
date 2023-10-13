@@ -45,9 +45,9 @@ class PlaceCard extends StatelessWidget {
                           bottomLeft: Radius.circular(10.0),
                         ),
                         image: DecorationImage(
-                          image: NetworkImage(place.photoUrl),
-                          fit: BoxFit.cover,
-                        ),
+                            image: CachedNetworkImageProvider(place.photoUrl),
+                            fit: BoxFit.cover,
+                          ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
