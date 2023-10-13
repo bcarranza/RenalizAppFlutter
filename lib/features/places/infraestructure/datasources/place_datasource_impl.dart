@@ -43,7 +43,7 @@ Future<Place> getPlaceById(String uid) async {
       throw Exception('La solicitud falló con el código de estado: ${response.statusCode}');
     }
   } catch (e) {
-    print('Error al obtener el lugar por UID: $e');
+   
     throw e; // Vuelve a lanzar la excepción para manejarla más adelante si es necesario.
   }
 }
@@ -59,19 +59,18 @@ Future<List<Place>> getPlaces() async {
       if (data != null && data['lugares'] is List) {
         final lugares = data['lugares'] as List<dynamic>;
         for (var placeData in lugares) {
-          print(placeData);
+          
           places.add(PlaceMapper.jsonToEntity(placeData));
         }
       } else {
-        print('Invalid data format in response.');
+        
       }
     } else {
-      print('Request failed with status code: ${response.statusCode}');
+      
     }
 
     return places;
   } catch (e) {
-    print('Error fetching places: $e');
     rethrow; // Rethrow the exception to handle it further if needed.
   }
 }
