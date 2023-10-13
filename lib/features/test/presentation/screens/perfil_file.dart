@@ -242,7 +242,7 @@ class _PerfilFileState extends State<PerfilFile> {
         ),
         subtitle: GestureDetector(
           onTap: () {
-            _launchPhone(subtitle);
+            launch("tel://${subtitle}");
           },
           child: Text(
             subtitle,
@@ -262,7 +262,7 @@ class _PerfilFileState extends State<PerfilFile> {
         ),
         subtitle: GestureDetector(
           onTap: () {
-            _launchEmail(subtitle);
+            launch("mailto://${subtitle}");
           },
           child: Text(
             subtitle,
@@ -292,24 +292,6 @@ class _PerfilFileState extends State<PerfilFile> {
           ),
         ),
       );
-    }
-  }
-
-  void _launchPhone(String phoneNumber) async {
-    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
-    if (await canLaunch(phoneUri.toString())) {
-      await launch(phoneUri.toString());
-    } else {
-      print('No se puede abrir la aplicación de teléfono.');
-    }
-  }
-
-  void _launchEmail(String emailAddress) async {
-    final Uri emailUri = Uri(scheme: 'mailto', path: emailAddress);
-    if (await canLaunch(emailUri.toString())) {
-      await launch(emailUri.toString());
-    } else {
-      print('No se puede abrir la aplicación de correo.');
     }
   }
 
