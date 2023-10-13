@@ -42,7 +42,7 @@ class AuthProvider extends ChangeNotifier {
         }
       }
     } catch (error) {
-      print(error);
+     
     }
   }
 
@@ -76,7 +76,6 @@ class AuthProvider extends ChangeNotifier {
       // Notificar a los observadores que el usuario ha cerrado sesión
       notifyListeners();
     } catch (error) {
-      print('Error al cerrar sesión: $error');
     }
   }
 }

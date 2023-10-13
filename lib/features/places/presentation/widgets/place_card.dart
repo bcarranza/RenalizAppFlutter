@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -105,8 +106,9 @@ class PlaceCard extends StatelessWidget {
                             bottomLeft: Radius.circular(10.0),
                           ),
                           image: DecorationImage(
-                            image: NetworkImage(place.photoUrl),
+                            image: CachedNetworkImageProvider(place.photoUrl),
                             fit: BoxFit.cover,
+                            
                           ),
                         ),
                         child: Column(
