@@ -4,6 +4,7 @@ import 'package:renalizapp/features/home/home.dart';
 import 'package:renalizapp/features/places/places.dart';
 import 'package:renalizapp/features/home/presentation/screens/blog_detail.dart';
 import 'package:renalizapp/features/test/presentation/screens/history_page.dart';
+import 'package:renalizapp/features/test/presentation/screens/history_page_detail.dart';
 import 'package:renalizapp/features/test/presentation/screens/login_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/mentions_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
@@ -73,6 +74,15 @@ final appRouter =
                   builder: (context, state) =>
                       QuizzPage(appRouter: GoRouter.of(context)),
                 ),
+                GoRoute(
+                    path: 'historial/detalle_historial/:uid',
+                    name: "HistoryDetail",
+                    builder: (context, state) {
+                      final Map<String, String> params = state.pathParameters;
+                      return HistoryPageDetail(
+                        uid: params['uid'],
+                      );
+                    }),
               ],
             ),
           ],
