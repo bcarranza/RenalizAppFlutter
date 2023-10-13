@@ -21,6 +21,8 @@ final _shellNavigatorTestKey =
     GlobalKey<NavigatorState>(debugLabel: 'shellTest');
 final _shellNavigatorHelpCenterKey =
     GlobalKey<NavigatorState>(debugLabel: 'shellHelpCenter');
+final _shellNavigatorLoginKey =
+    GlobalKey<NavigatorState>(debugLabel: 'shellLogin');
 
 final appRouter =
     GoRouter(initialLocation: '/', navigatorKey: _rootNavigatorKey, routes: [
@@ -62,59 +64,61 @@ final appRouter =
                       PatientForm(appRouter: GoRouter.of(context)),
                 ),
                 GoRoute(
-                  path: 'login',
-                  builder: (context, state) =>
-                      LoginScreen(appRouter: GoRouter.of(context)),
-                ),
-                GoRoute(
                   path: 'historial',
                   builder: (context, state) =>
                       HistoryPage(appRouter: GoRouter.of(context)),
                 ),
+                GoRoute(
+                  path: 'quizz',
+                  builder: (context, state) =>
+                      QuizzPage(appRouter: GoRouter.of(context)),
+                ),
               ],
-            ),
-            GoRoute(
-              path: '/quizz',
-              pageBuilder: (context, state) => NoTransitionPage(
-                  child: QuizzPage(
-                appRouter: GoRouter.of(context),
-              )),
-            ),
-            GoRoute(
-              path: '/profile',
-              pageBuilder: (context, state) =>
-                  NoTransitionPage(child: PerfilFile()),
-            ),
-            GoRoute(
-              path: '/mentions',
-              pageBuilder: (context, state) => NoTransitionPage(
-                  child: EquipoPage(
-                appRouter: GoRouter.of(context),
-              )),
             ),
           ],
         ),
 
         //helpcenter branch
-       StatefulShellBranch(navigatorKey: _shellNavigatorHelpCenterKey, routes: [
-        GoRoute(
-        path: '/helpcenters',
-        pageBuilder: (context, state) =>
-            const NoTransitionPage(child: PlacesScreen(subPath: '/chat/1')),
-        routes: [
-          // Agrega una subruta a la rama "helpcenter"
-          GoRoute(
-            path: 'detailCenter/:uid',
-            name:"PlaceDetail",
-            builder: (context, state) {
-              final Map<String, String> params = state.pathParameters;
-              return PlaceDetailScreen(
-                uid: params['uid'],
-              );
-            },
-          ),
-        ],
-      ),
-    ])
-      ])
+        StatefulShellBranch(
+            navigatorKey: _shellNavigatorHelpCenterKey,
+            routes: [
+              GoRoute(
+                path: '/helpcenters',
+                pageBuilder: (context, state) => const NoTransitionPage(
+                    child: PlacesScreen(subPath: '/chat/1')),
+                routes: [
+                  // Agrega una subruta a la rama "helpcenter"
+                  GoRoute(
+                    path: 'detailCenter/:uid',
+                    name: "PlaceDetail",
+                    builder: (context, state) {
+                      final Map<String, String> params = state.pathParameters;
+                      return PlaceDetailScreen(
+                        uid: params['uid'],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ]),
+      ]),
+  GoRoute(
+    path: '/login',
+    pageBuilder: (context, state) => NoTransitionPage(child: LoginScreen()),
+    routes: [
+      // Agrega una subruta a la rama "login"
+    ],
+  ),
+  GoRoute(
+    path: '/profile',
+    pageBuilder: (context, state) =>
+        NoTransitionPage(child: PerfilFile(appRouter: GoRouter.of(context))),
+  ),
+  GoRoute(
+    path: '/mentions',
+    pageBuilder: (context, state) => NoTransitionPage(
+        child: EquipoPage(
+      appRouter: GoRouter.of(context),
+    )),
+  ),
 ]);

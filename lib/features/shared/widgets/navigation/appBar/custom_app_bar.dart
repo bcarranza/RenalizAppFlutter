@@ -63,7 +63,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       icon: const Icon(Icons.logout),
                       onPressed: () {
                         authProvider.signOut();
-                        Navigator.of(context).popUntil((route) => route.isFirst);
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
                       },
                     ),
                   ],

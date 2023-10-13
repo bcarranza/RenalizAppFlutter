@@ -43,10 +43,25 @@ class _PatientFormState extends State<PatientForm> {
 
   PatientFormData _formData = PatientFormData();
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Obtener el usuario actualmente autenticado
+    final user = FirebaseAuth.instance.currentUser;
+
+    // Verificar si el usuario tiene un correo electrónico
+    if (user != null && user.email != null) {
+      setState(() {
+        _formData.email = user.email;
+      });
+    }
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: DateTime(1990, 1, 1),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       locale: Locale('es', 'ES'),
@@ -246,6 +261,7 @@ class _PatientFormState extends State<PatientForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('Registro de Paciente'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
@@ -277,16 +293,64 @@ class _PatientFormState extends State<PatientForm> {
                 ],
               ),
             ),
-            SizedBox(height: 20.0),
-            // Colocar los botones debajo del último campo de cada formulario
-            Column(
+          ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: _currentPage < 2
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.end,
               children: [
-                _buildBackButton(),
-                SizedBox(height: 16.0),
-                _buildNextButton(),
-                SizedBox(height: 25.0),
+                if (_currentPage > 0)
+                  ElevatedButton(
+                    onPressed: _previousPage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                    ),
+                    child: Text(
+                      'Atrás',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                if (_currentPage < 2)
+                  ElevatedButton(
+                    onPressed: _nextPage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                    ),
+                    child: Text(
+                      'Siguiente',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                if (_currentPage == 2)
+                  ElevatedButton(
+                    onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                    ),
+                    child: Text(
+                      'Enviar',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
               ],
             ),
+            SizedBox(height: 25.0),
           ],
         ),
       ),

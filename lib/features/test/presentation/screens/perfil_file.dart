@@ -7,8 +7,14 @@ import 'package:renalizapp/features/shared/widgets/navigation/appBar/custom_app_
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
 
 class PerfilFile extends StatefulWidget {
+  final GoRouter appRouter;
+
+  PerfilFile({required this.appRouter});
   @override
   _PerfilFileState createState() => _PerfilFileState();
 }
@@ -102,7 +108,12 @@ class _PerfilFileState extends State<PerfilFile> {
     }
 
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => context.go('/'),
+        ),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -124,7 +135,7 @@ class _PerfilFileState extends State<PerfilFile> {
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          context.go('/test/login');
+                          context.push('/login');
                         },
                         child: Text("Inicia sesión ahora"),
                       ),
@@ -150,6 +161,10 @@ class _PerfilFileState extends State<PerfilFile> {
                         String userSecondLastName =
                             user['Second_Last_Name'] ?? '';
                         String userBirthDate = user['Birth_Date'] ?? '';
+                        // Formatear la fecha
+                        final dateFormat = DateFormat('yyyy-MM-dd');
+                        String formattedBirthDate =
+                            dateFormat.format(DateTime.parse(userBirthDate));
                         String documentType = user['DPI'] ?? '';
                         String telephoneNumber = user['Telephone_Number'] ?? '';
                         String email = user['Email'] ?? '';
@@ -180,10 +195,13 @@ class _PerfilFileState extends State<PerfilFile> {
                                   ),
                                 ),
                                 SizedBox(height: 20),
-                                _buildProfileInfo(Icons.calendar_today,
-                                    'Fecha de Nacimiento', userBirthDate),
-                                _buildProfileInfo(Icons.perm_identity,
-                                    'Tipo de Documento', documentType),
+                                _buildProfileInfo(
+                                  Icons.calendar_today,
+                                  'Fecha de Nacimiento',
+                                  formattedBirthDate,
+                                ),
+                                _buildProfileInfo(
+                                    Icons.perm_identity, 'DPI', documentType),
                                 _buildProfileInfo(
                                     Icons.phone, 'Teléfono', telephoneNumber),
                                 _buildProfileInfo(Icons.email, 'Email', email),
@@ -215,13 +233,90 @@ class _PerfilFileState extends State<PerfilFile> {
   }
 
   Widget _buildProfileInfo(IconData icon, String title, String subtitle) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.blueAccent),
-      title: Text(
-        title,
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(subtitle),
+    if (title == 'Teléfono' && subtitle.isNotEmpty) {
+      return ListTile(
+        leading: Icon(icon, color: Colors.blueAccent),
+        title: Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: GestureDetector(
+          onTap: () {
+            _launchPhone(subtitle);
+          },
+          child: Text(
+            subtitle,
+            style: TextStyle(
+              color: Colors.blueAccent,
+              decoration: TextDecoration.underline, // Cambia a color negro
+            ),
+          ),
+        ),
+      );
+    } else if (title == 'Email' && subtitle.isNotEmpty) {
+      return ListTile(
+        leading: Icon(icon, color: Colors.blueAccent),
+        title: Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: GestureDetector(
+          onTap: () {
+            _launchEmail(subtitle);
+          },
+          child: Text(
+            subtitle,
+            style: TextStyle(
+              color: Colors.blueAccent,
+              decoration: TextDecoration.underline, // Cambia a color negro
+            ),
+          ),
+        ),
+      );
+    } else {
+      return ListTile(
+        leading: Icon(icon, color: Colors.blueAccent),
+        title: Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: GestureDetector(
+          onLongPress: () {
+            _copyToClipboard(subtitle);
+          },
+          child: Text(
+            subtitle,
+            style: TextStyle(
+              color: Colors.black, // Cambia a color negro
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _launchPhone(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunch(phoneUri.toString())) {
+      await launch(phoneUri.toString());
+    } else {
+      print('No se puede abrir la aplicación de teléfono.');
+    }
+  }
+
+  void _launchEmail(String emailAddress) async {
+    final Uri emailUri = Uri(scheme: 'mailto', path: emailAddress);
+    if (await canLaunch(emailUri.toString())) {
+      await launch(emailUri.toString());
+    } else {
+      print('No se puede abrir la aplicación de correo.');
+    }
+  }
+
+  void _copyToClipboard(String text) {
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Texto copiado al portapapeles')),
     );
   }
 }

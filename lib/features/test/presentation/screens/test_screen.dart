@@ -27,7 +27,7 @@ class TestScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 // context.go(subPath);
-                context.go('/quizz');
+                context.go('/test/quizz');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
@@ -45,7 +45,7 @@ class TestScreen extends StatelessWidget {
             authProvider.currentUser == null
                 ? ElevatedButton(
                     onPressed: () {
-                      context.go('/test/login');
+                      context.push('/login');
                     },
                     style: ElevatedButton.styleFrom(
                       padding:

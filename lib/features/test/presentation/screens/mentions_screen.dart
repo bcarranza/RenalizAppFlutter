@@ -106,7 +106,7 @@ class _EquipoPageState extends State<EquipoPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            context.go("/test");
+            context.go('/');
           },
         ),
       ),

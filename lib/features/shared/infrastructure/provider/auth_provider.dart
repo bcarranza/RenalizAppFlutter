@@ -37,8 +37,7 @@ class AuthProvider extends ChangeNotifier {
           } else {
             // El usuario no es nuevo, llévalo a la pantalla de perfil
             notifyListeners();
-            context.go(
-                '/profile'); // Cambia '/profile' por la ruta correcta de perfil
+            context.pop(); // Cambia '/profile' por la ruta correcta de perfil
           }
         }
       }
