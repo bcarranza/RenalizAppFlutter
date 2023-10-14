@@ -9,6 +9,7 @@ import 'package:renalizapp/features/test/presentation/screens/mentions_screen.da
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
 import 'package:renalizapp/features/test/presentation/screens/perfil_file.dart';
 import 'package:renalizapp/features/test/presentation/screens/questions_interface.dart';
+import 'package:renalizapp/features/test/presentation/screens/whatsapp.dart';
 import 'package:renalizapp/features/test/test.dart';
 
 import '../../features/shared/widgets/scaffold_with_nested_navigation/scaffold_nested.dart';
@@ -21,6 +22,9 @@ final _shellNavigatorTestKey =
     GlobalKey<NavigatorState>(debugLabel: 'shellTest');
 final _shellNavigatorHelpCenterKey =
     GlobalKey<NavigatorState>(debugLabel: 'shellHelpCenter');
+final _shellNavigatorWhatsAppKey =
+    GlobalKey<NavigatorState>(debugLabel: 'WhatsApp');
+
 
 final appRouter =
     GoRouter(initialLocation: '/', navigatorKey: _rootNavigatorKey, routes: [
@@ -96,7 +100,7 @@ final appRouter =
         ),
 
         //helpcenter branch
-       StatefulShellBranch(navigatorKey: _shellNavigatorHelpCenterKey, routes: [
+        StatefulShellBranch(navigatorKey: _shellNavigatorHelpCenterKey, routes: [
         GoRoute(
         path: '/helpcenters',
         pageBuilder: (context, state) =>
@@ -113,6 +117,17 @@ final appRouter =
               );
             },
           ),
+        ],
+      ),
+    ]),
+    StatefulShellBranch(navigatorKey: _shellNavigatorWhatsAppKey, routes: [
+        GoRoute(
+        path: '/whatsapp',
+        pageBuilder: (context, state) =>
+            NoTransitionPage(child: WhatsAppScreen()),
+        routes: [
+          // Agrega una subruta a la rama "helpcenter"
+        
         ],
       ),
     ])

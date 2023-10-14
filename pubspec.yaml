@@ -29,10 +29,14 @@ dependencies:
   google_fonts: ^5.1.0
   google_sign_in: ^6.1.5
   http: ^1.1.0
+  image_picker: ^1.0.4
   maps_launcher: ^2.2.0
   provider: ^6.0.5
   random_avatar: ^0.0.8
   shared_preferences: ^2.2.1
+  whatsapp: ^0.0.1
+  url_launcher: ^6.1.14
+  file_picker: ^4.1.6
 
 dev_dependencies:
   flutter_lints: ^2.0.0
