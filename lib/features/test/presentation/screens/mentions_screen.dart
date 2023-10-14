@@ -148,7 +148,7 @@ class _EquipoPageState extends State<EquipoPage> {
     final double cardHeight = imageHeight + 100.0;
 
     return Card(
-      elevation: 5,
+      elevation: 0, // Esto elimina la sombra
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
       ),
@@ -203,7 +203,7 @@ class _EquipoPageState extends State<EquipoPage> {
 
   Widget _buildBackCard(Empleado empleado) {
     return Card(
-      elevation: 5,
+      elevation: 0, // Esto elimina la sombra
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
       ),

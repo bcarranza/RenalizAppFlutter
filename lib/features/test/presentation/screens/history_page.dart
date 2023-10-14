@@ -95,65 +95,141 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
       body: _isLoading
           ? Center(
-              child:
-                  CircularProgressIndicator()) // Muestra el indicador de carga si _isLoading es true
+              child: CircularProgressIndicator(),
+            )
           : ListView.builder(
               itemCount: history.length,
               itemBuilder: (context, index) {
                 // Divide la cadena almacenada en SharedPreferences
-                final data = history[index].split(';');
-                if (data.length == 4) {
+                final rawData = history[index];
+                final data =
+                    rawData.replaceAll(RegExp(r'^\[|\]$'), '').split(';');
+                if (data.length >= 4) {
                   final score = data[0];
                   final resultMessage = data[1];
                   final resultDescription = data[2];
                   final testDate = data[3];
+                  final uid = data.length > 4 ? data[4] : "";
 
-                  return Card(
-                    elevation: 3, // Sombra ligera
-                    margin:
-                        EdgeInsets.all(8), // Margen alrededor de cada tarjeta
-                    child: ListTile(
-                      title: Text(
-                        "Puntuación: $score",
-                        style: TextStyle(
-                          fontSize: 16, // Tamaño de fuente personalizado
-                          fontWeight:
-                              FontWeight.bold, // Tipo de letra en negrita
-                          fontFamily:
-                              'Roboto', // Cambia esto según tus preferencias
+                  // Verificar si hay un uid
+                  if (uid.isNotEmpty) {
+                    return GestureDetector(
+                      onTap: () {
+                        final params = {
+                          'uid': uid,
+                        };
+                        context.goNamed("HistoryDetail",
+                            pathParameters: params);
+                      },
+                      child: Card(
+                        elevation: 3,
+                        margin: EdgeInsets.all(8),
+                        child: ListTile(
+                          title: Text(
+                            "Puntuación: $score",
+                            style: TextStyle(
+                              fontSize: 16, // Tamaño de fuente personalizado
+                              fontWeight:
+                                  FontWeight.bold, // Tipo de letra en negrita
+                              fontFamily:
+                                  'Roboto', // Cambia esto según tus preferencias
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Resultado: $resultMessage",
+                                style: TextStyle(
+                                  fontSize:
+                                      14, // Tamaño de fuente personalizado
+                                  fontFamily:
+                                      'Roboto', // Cambia esto según tus preferencias
+                                ),
+                              ),
+                              Text(
+                                "Descripción: $resultDescription",
+                                style: TextStyle(
+                                  fontSize:
+                                      14, // Tamaño de fuente personalizado
+                                  fontFamily:
+                                      'Roboto', // Cambia esto según tus preferencias
+                                ),
+                              ),
+                              Text(
+                                "Fecha de la prueba: $testDate",
+                                style: TextStyle(
+                                  fontSize:
+                                      14, // Tamaño de fuente personalizado
+                                  fontFamily:
+                                      'Roboto', // Cambia esto según tus preferencias
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Resultado: $resultMessage",
+                    );
+                  } else {
+                    // Mostrar un mensaje si no hay uid
+                    return GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'Debes iniciar sesión para ver los resultados de este test')),
+                        );
+                      },
+                      child: Card(
+                        elevation: 3,
+                        margin: EdgeInsets.all(8),
+                        child: ListTile(
+                          title: Text(
+                            "Puntuación: $score",
                             style: TextStyle(
-                              fontSize: 14, // Tamaño de fuente personalizado
+                              fontSize: 16, // Tamaño de fuente personalizado
+                              fontWeight:
+                                  FontWeight.bold, // Tipo de letra en negrita
                               fontFamily:
                                   'Roboto', // Cambia esto según tus preferencias
                             ),
                           ),
-                          Text(
-                            "Descripción: $resultDescription",
-                            style: TextStyle(
-                              fontSize: 14, // Tamaño de fuente personalizado
-                              fontFamily:
-                                  'Roboto', // Cambia esto según tus preferencias
-                            ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Resultado: $resultMessage",
+                                style: TextStyle(
+                                  fontSize:
+                                      14, // Tamaño de fuente personalizado
+                                  fontFamily:
+                                      'Roboto', // Cambia esto según tus preferencias
+                                ),
+                              ),
+                              Text(
+                                "Descripción: $resultDescription",
+                                style: TextStyle(
+                                  fontSize:
+                                      14, // Tamaño de fuente personalizado
+                                  fontFamily:
+                                      'Roboto', // Cambia esto según tus preferencias
+                                ),
+                              ),
+                              Text(
+                                "Fecha de la prueba: $testDate",
+                                style: TextStyle(
+                                  fontSize:
+                                      14, // Tamaño de fuente personalizado
+                                  fontFamily:
+                                      'Roboto', // Cambia esto según tus preferencias
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            "Fecha de la prueba: $testDate",
-                            style: TextStyle(
-                              fontSize: 14, // Tamaño de fuente personalizado
-                              fontFamily:
-                                  'Roboto', // Cambia esto según tus preferencias
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  }
                 }
                 return Container(); // Opcional: Manejar datos incorrectos
               },
