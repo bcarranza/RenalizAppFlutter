@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  final GoRouter appRouter; // Agrega una propiedad para almacenar el enrutador
+  // Agrega una propiedad para almacenar el enrutador
 
-  LoginScreen({required this.appRouter});
+  LoginScreen({Key? key}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         // Si el registro es exitoso, navega a la ruta '/profile'
-        widget.appRouter.go('/test/patient-form'); // Modificación aquí
+        context.pop(); // Modificación aquí
       } catch (error) {
         // Si hay un error, muestra un mensaje al usuario
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         // Si el inicio de sesión es exitoso, navega a la ruta '/profile'
-        widget.appRouter.go('/profile'); // Modificación aquí
+        context.pop(); // Modificación aquí
       } catch (error) {
         // Si hay un error, muestra un mensaje al usuario
         ScaffoldMessenger.of(context).showSnackBar(
@@ -113,6 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
         title: Text('Iniciar Sesión / Registrarse'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
