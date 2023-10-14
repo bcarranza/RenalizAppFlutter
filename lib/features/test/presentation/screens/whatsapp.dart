@@ -43,7 +43,7 @@ class WhatsAppScreen extends StatelessWidget {
   }
 
   void openWhatsApp(BuildContext context, String? iduser, String? username) async {
-    var whatsapp = "+50240515851";
+    var whatsapp = "+50249192039";
     var message = Uri.encodeComponent(
         "Hola Renalizapp, Soy el Usuario id: $iduser  , nombre: $username ; adjunto el comprobante de exámen para colaborar con la comprobación de su hipótesis.");
     
@@ -58,18 +58,12 @@ class WhatsAppScreen extends StatelessWidget {
       }
     } else {
       final whatsappURL = Uri.parse("whatsapp://send?phone=$whatsapp&text=$message");
-      if (await canLaunchUrl(whatsappURL)) {
-        await launchUrl(whatsappURL);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("WhatsApp no está instalado."),
-        ));
-      }
+      await launchUrl(whatsappURL);
     }
   }
 
   void openWhatsAppWeb(String? iduser, String? username) {
-    final phoneNumber = "+50240515851";
+    final phoneNumber = "+50249192039";
     final message = "Hola Renalizapp, Soy el Usuario id: $iduser , nombre: $username ; adjunto el comprobante de exámen para colaborar con la comprobación de su hipótesis.";
     final url = Uri.parse('https://web.whatsapp.com/send?phone=$phoneNumber&text=${Uri.encodeComponent(message)}');
     launchUrl(url); // Abre el enlace en el navegador web
