@@ -6,6 +6,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'features/shared/infrastructure/provider/auth_provider.dart';
 import 'firebase_options.dart';
 
+
+
 void main() async {
   await Environment.initEnvironment();
   WidgetsFlutterBinding.ensureInitialized();
