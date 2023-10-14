@@ -37,13 +37,12 @@ class AuthProvider extends ChangeNotifier {
           } else {
             // El usuario no es nuevo, llévalo a la pantalla de perfil
             notifyListeners();
-            context.go(
-                '/profile'); // Cambia '/profile' por la ruta correcta de perfil
+            context.pop(); // Cambia '/profile' por la ruta correcta de perfil
           }
         }
       }
     } catch (error) {
-      print(error);
+     
     }
   }
 
@@ -77,7 +76,6 @@ class AuthProvider extends ChangeNotifier {
       // Notificar a los observadores que el usuario ha cerrado sesión
       notifyListeners();
     } catch (error) {
-      print('Error al cerrar sesión: $error');
     }
   }
 }

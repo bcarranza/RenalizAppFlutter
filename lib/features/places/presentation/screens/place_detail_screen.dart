@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,7 +53,7 @@ class PlaceDetailScreen extends StatelessWidget {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: NetworkImage(place.photoUrl),
+                        image: CachedNetworkImageProvider(place.photoUrl),
                         fit: BoxFit.cover,
                       ),
                     ),

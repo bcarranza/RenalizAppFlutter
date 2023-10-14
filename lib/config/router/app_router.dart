@@ -4,6 +4,7 @@ import 'package:renalizapp/features/home/home.dart';
 import 'package:renalizapp/features/places/places.dart';
 import 'package:renalizapp/features/home/presentation/screens/blog_detail.dart';
 import 'package:renalizapp/features/test/presentation/screens/history_page.dart';
+import 'package:renalizapp/features/test/presentation/screens/history_page_detail.dart';
 import 'package:renalizapp/features/test/presentation/screens/login_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/mentions_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/patient_form.dart';
@@ -24,6 +25,8 @@ final _shellNavigatorHelpCenterKey =
     GlobalKey<NavigatorState>(debugLabel: 'shellHelpCenter');
 final _shellNavigatorWhatsAppKey =
     GlobalKey<NavigatorState>(debugLabel: 'WhatsApp');
+final _shellNavigatorLoginKey =
+    GlobalKey<NavigatorState>(debugLabel: 'shellLogin');
 
 
 final appRouter =
@@ -66,35 +69,25 @@ final appRouter =
                       PatientForm(appRouter: GoRouter.of(context)),
                 ),
                 GoRoute(
-                  path: 'login',
-                  builder: (context, state) =>
-                      LoginScreen(appRouter: GoRouter.of(context)),
-                ),
-                GoRoute(
                   path: 'historial',
                   builder: (context, state) =>
                       HistoryPage(appRouter: GoRouter.of(context)),
                 ),
+                GoRoute(
+                  path: 'quizz',
+                  builder: (context, state) =>
+                      QuizzPage(appRouter: GoRouter.of(context)),
+                ),
+                GoRoute(
+                    path: 'historial/detalle_historial/:uid',
+                    name: "HistoryDetail",
+                    builder: (context, state) {
+                      final Map<String, String> params = state.pathParameters;
+                      return HistoryPageDetail(
+                        uid: params['uid'],
+                      );
+                    }),
               ],
-            ),
-            GoRoute(
-              path: '/quizz',
-              pageBuilder: (context, state) => NoTransitionPage(
-                  child: QuizzPage(
-                appRouter: GoRouter.of(context),
-              )),
-            ),
-            GoRoute(
-              path: '/profile',
-              pageBuilder: (context, state) =>
-                  NoTransitionPage(child: PerfilFile()),
-            ),
-            GoRoute(
-              path: '/mentions',
-              pageBuilder: (context, state) => NoTransitionPage(
-                  child: EquipoPage(
-                appRouter: GoRouter.of(context),
-              )),
             ),
           ],
         ),
@@ -131,5 +124,24 @@ final appRouter =
         ],
       ),
     ])
-      ])
+      ]),
+  GoRoute(
+    path: '/login',
+    pageBuilder: (context, state) => NoTransitionPage(child: LoginScreen()),
+    routes: [
+      // Agrega una subruta a la rama "login"
+    ],
+  ),
+  GoRoute(
+    path: '/profile',
+    pageBuilder: (context, state) =>
+        NoTransitionPage(child: PerfilFile(appRouter: GoRouter.of(context))),
+  ),
+  GoRoute(
+    path: '/mentions',
+    pageBuilder: (context, state) => NoTransitionPage(
+        child: EquipoPage(
+      appRouter: GoRouter.of(context),
+    )),
+  ),
 ]);
