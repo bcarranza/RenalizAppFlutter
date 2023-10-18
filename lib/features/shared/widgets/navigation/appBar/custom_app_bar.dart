@@ -66,7 +66,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       key: const Key("profileIcon"),
                       icon: const Icon(Icons.person),
                       onPressed: () {
-                        GoRouter.of(context).go('/profile');
+                        GoRouter.of(context).push('/profile');
                       },
                     ),
                     IconButton(
@@ -90,7 +90,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   key: const Key("loggedOutIcon"),
                   icon: const Icon(Icons.person_outlined),
                   onPressed: () {
-                    GoRouter.of(context).go('/profile');
+                    GoRouter.of(context).push('/profile');
                   },
                 ),
               ),

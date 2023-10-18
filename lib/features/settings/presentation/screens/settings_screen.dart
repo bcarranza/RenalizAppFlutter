@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:renalizapp/main.dart';
+
+import '../../providers/theme_notifier.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -12,6 +16,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final themeNotifier = context.read<ThemeNotifier>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configuración'),
@@ -22,11 +29,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('Modo Oscuro'),
             subtitle: const Text('Habilitar el modo oscuro'),
             trailing: Switch(
-              value: isDarkModeEnabled,
+              value: themeNotifier.isDarkMode, 
               onChanged: (bool newValue) {
                 setState(() {
-                  isDarkModeEnabled = newValue;
-                  
+                  themeNotifier.toggleDarkMode();
                 });
               },
             ),
