@@ -18,7 +18,7 @@ class PlaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 450;
-    Color mainColor = Theme.of(context).primaryColor;
+    Color mainColor = Theme.of(context).colorScheme.primary;
 
     return Card(
       shape: RoundedRectangleBorder(

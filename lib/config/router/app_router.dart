@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:renalizapp/features/home/home.dart';
 import 'package:renalizapp/features/places/places.dart';
 import 'package:renalizapp/features/home/presentation/screens/blog_detail.dart';
+import 'package:renalizapp/features/settings/presentation/screens/settings_screen.dart';
 import 'package:renalizapp/features/test/presentation/screens/history_page.dart';
 import 'package:renalizapp/features/test/presentation/screens/history_page_detail.dart';
 import 'package:renalizapp/features/test/presentation/screens/login_screen.dart';
@@ -136,6 +137,15 @@ final appRouter =
     path: '/profile',
     pageBuilder: (context, state) =>
         NoTransitionPage(child: PerfilFile(appRouter: GoRouter.of(context))),
+        routes: [
+      GoRoute(
+            path: 'settings',
+            name:"settings",
+            builder: (context, state) {
+              return const SettingsScreen();
+            },
+          ),
+    ],
   ),
   GoRoute(
     path: '/mentions',

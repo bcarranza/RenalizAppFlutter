@@ -11,6 +11,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
         final isUserLoggedIn = authProvider.currentUser != null;
@@ -47,7 +48,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               fontSize: isUserLoggedIn ? 22 : 18,
               fontWeight: isUserLoggedIn ? FontWeight.bold : FontWeight.normal,
               fontStyle: isUserLoggedIn ? FontStyle.italic : FontStyle.normal,
-              color: isUserLoggedIn ? const Color(0xFF00629D) : Colors.black,
+              color: isUserLoggedIn ? const Color(0xFF00629D) : Theme.of(context).textTheme.labelMedium?.color ,
             ),
             child: const Text("RenalizApp"),
           ),
