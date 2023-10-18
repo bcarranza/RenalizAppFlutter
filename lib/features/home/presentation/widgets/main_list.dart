@@ -84,6 +84,7 @@ class _MainListState extends State<MainList> {
 
   @override
   Widget build(BuildContext context) {
+    Color mainColor = Theme.of(context).colorScheme.primary;
     double txtScale = MediaQuery.of(context).textScaleFactor;
 
     _scrollController.addListener(() async {
@@ -198,7 +199,7 @@ class _MainListState extends State<MainList> {
                                                         vertical: 0.0,
                                                         horizontal:
                                                             2.0), // Ajusta el padding según tus preferencias
-                                                    child: Text(tag),
+                                                    child: Text(tag , overflow: TextOverflow.ellipsis,),
                                                   ),
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
@@ -206,7 +207,7 @@ class _MainListState extends State<MainList> {
                                                             25.0),
                                                   ),
                                                   backgroundColor:
-                                                      generateColor(tag),
+                                                      generateColorWithOpacity(tag, mainColor,0.9),
                                                   labelStyle: TextStyle(
                                                     color: Colors.white,
                                                   )))
@@ -245,12 +246,18 @@ class _MainListState extends State<MainList> {
   }
 }
 
-Color generateColor(String text) {
+Color generateColorWithOpacity(String text, Color baseColor, double opacity) {
   final random = Random(text.hashCode);
-  return Color.fromRGBO(
-    random.nextInt(256),
-    random.nextInt(256),
-    random.nextInt(256),
-    1.0,
-  );
+
+  // Calcula un valor de diferencia aleatorio para R, G y B
+  final deltaR = random.nextInt(51) - 25; // Valor entre -25 y 25
+  final deltaG = random.nextInt(51) - 25;
+  final deltaB = random.nextInt(51) - 25;
+
+  // Aplica la diferencia al color base
+  final red = (baseColor.red + deltaR).clamp(0, 255);
+  final green = (baseColor.green + deltaG).clamp(0, 255);
+  final blue = (baseColor.blue + deltaB).clamp(0, 255);
+
+  return Color.fromRGBO(red, green, blue, opacity);
 }
