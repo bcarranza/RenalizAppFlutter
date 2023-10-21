@@ -109,10 +109,17 @@ class _PerfilFileState extends State<PerfilFile> {
 
     return Scaffold(
       appBar: AppBar(
+        title: const Text("Perfil"),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
         ),
+         actions: <Widget>[
+      IconButton(
+        icon: const Icon(Icons.settings), 
+          onPressed: () => context.pushNamed('settings')
+      ),
+    ],
       ),
       body: Center(
         child: Padding(
@@ -287,7 +294,7 @@ class _PerfilFileState extends State<PerfilFile> {
           child: Text(
             subtitle,
             style: TextStyle(
-              color: Colors.black, // Cambia a color negro
+              color: Theme.of(context).textTheme.labelMedium?.color // Cambia a color negro
             ),
           ),
         ),

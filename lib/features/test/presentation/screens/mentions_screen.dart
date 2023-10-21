@@ -17,18 +17,12 @@ class EquipoPage extends StatefulWidget {
 
 class Empleado {
   String nombre;
-  String cargo;
   String foto;
-  String correo;
-  String telefono;
   String descripcion;
 
   Empleado({
     required this.nombre,
-    required this.cargo,
     required this.foto,
-    required this.correo,
-    required this.telefono,
     required this.descripcion,
   });
 }
@@ -36,45 +30,59 @@ class Empleado {
 class _EquipoPageState extends State<EquipoPage> {
   List<Empleado> empleados = [];
 
-  int _currentIndex = 0;
-  List<String> listaDeIds = [
-    'FJPkMhS8cHbERBsfVMV0',
-  ];
-
   _EquipoPageState() {
-    // Aquí puedes agregar el ciclo para cargar los datos de los empleados
-    for (String empleadoId in listaDeIds) {
-      obtenerEmpleadoPorId(empleadoId);
-    }
+    // Aquí puedes cargar los datos de las colecciones en lugar de IDs
+    cargarEmpleados();
   }
 
-  Future<void> obtenerEmpleadoPorId(String empleadoId) async {
+  Future<void> cargarEmpleados() async {
     final Uri url = Uri.parse(dotenv.env['API_URL']! + 'getMentions');
 
-    final body = {
-      "id": empleadoId,
-    };
-
-    final response = await http.post(url, body: body);
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      setState(() {
-        empleados.add(
-          Empleado(
-            nombre: data['name'].toString(),
-            cargo: data['Role'].toString(),
-            foto: data['foto'].toString(),
-            correo: data['email'].toString(),
-            telefono: data['Number_phone'].toString(),
-            descripcion: data['description'].toString(),
-          ),
-        );
-      });
+      if (data is List) {
+        // Si los datos son una lista, podemos procesar cada elemento
+        for (var item in data) {
+          final empleado = Empleado(
+            nombre: item['name'].toString(),
+            foto: item['foto'].toString(),
+            descripcion: item['description']
+                .toString()
+                .replaceAll("[", "")
+                .replaceAll("]", ""),
+          );
+          empleados.add(empleado);
+        }
+        setState(() {});
+      } else {
+        print('Error: los datos no son una lista');
+      }
     } else {
       print('Error: ${response.statusCode}');
-      throw Exception('Error al obtener datos del empleado');
+      throw Exception('Error al obtener datos de empleados');
     }
+  }
+
+  List<Widget> _buildDescripcion(
+      List<String> descripcionItems, double screenWidth) {
+    // Calcula el tamaño de fuente en función del ancho de la pantalla
+    double fontSize =
+        screenWidth * 0.04; // Puedes ajustar el factor según tus preferencias
+
+    return descripcionItems.map((item) {
+      return Row(
+        children: [
+          Icon(Icons.check_circle, size: 18),
+          SizedBox(width: 8),
+          Text(
+            item,
+            style: TextStyle(fontSize: fontSize),
+          ),
+        ],
+      );
+    }).toList();
   }
 
   @override
@@ -84,7 +92,7 @@ class _EquipoPageState extends State<EquipoPage> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blue, Colors.purple],
+              colors: [Colors.blue, Color.fromARGB(255, 4, 68, 204)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -123,9 +131,9 @@ class _EquipoPageState extends State<EquipoPage> {
                 viewportFraction: 0.85,
                 enlargeCenterPage: true,
                 onPageChanged: (index, reason) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
+                  // setState(() {
+                  //   _currentIndex = index;
+                  // });
                 },
               ),
             ),
@@ -151,6 +159,11 @@ class _EquipoPageState extends State<EquipoPage> {
       elevation: 0, // Esto elimina la sombra
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
+        side: BorderSide(
+          // Agrega este bloque para el borde
+          color: const Color.fromARGB(255, 0, 0, 0), // Color del borde
+          width: 2.0, // Ancho del borde
+        ),
       ),
       child: Column(
         children: [
@@ -185,14 +198,6 @@ class _EquipoPageState extends State<EquipoPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  empleado.cargo,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
-                ),
               ],
             ),
           ),
@@ -202,77 +207,40 @@ class _EquipoPageState extends State<EquipoPage> {
   }
 
   Widget _buildBackCard(Empleado empleado) {
-    return Card(
-      elevation: 0, // Esto elimina la sombra
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(16.0),
-            width: double.infinity,
-            color: Colors.blue,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "INFORMACIÓN ADICIONAL",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+    double screenWidth = MediaQuery.of(context).size.width;
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(16.0),
+              width: double.infinity,
+              color: Colors.blue,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "INFORMACIÓN ADICIONAL",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18, // Tamaño de letra aumentado a 28
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  "Correo electrónico:",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
-                ),
-                Text(
-                  empleado.correo,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-                SizedBox(height: 12),
-                Text(
-                  "Teléfono:",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
-                ),
-                Text(
-                  empleado.telefono,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          SizedBox(height: 20),
-          Text(
-            "DESCRIPCIÓN:",
-            style: TextStyle(
-              color: const Color.fromARGB(255, 0, 0, 0),
-              fontSize: 25,
+            SizedBox(height: 16),
+            Column(
+              children: _buildDescripcion(
+                  empleado.descripcion.split(', '), screenWidth),
             ),
-          ),
-          Text(
-            empleado.descripcion,
-            style: TextStyle(
-              color: const Color.fromARGB(255, 0, 0, 0),
-              fontSize: 18,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
