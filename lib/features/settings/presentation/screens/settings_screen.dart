@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:renalizapp/main.dart';
 
 import '../../providers/theme_notifier.dart';
 
@@ -39,7 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
            ListTile(
             title: const Text('Número de Versión'),
-            subtitle: const Text('Versión 0.4 Open Beta'),
+            subtitle: const Text('Versión 0.5 Open Beta'),
             onTap: () {
              
             },

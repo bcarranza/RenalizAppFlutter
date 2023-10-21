@@ -54,12 +54,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Llama a la función signUp del AuthProvider
         authProvider.signUp(
+          context,
           _emailController.text.trim(),
           _passwordController.text.trim(),
         );
-
-        // Si el registro es exitoso, navega a la ruta '/profile'
-        context.pop(); // Modificación aquí
       } catch (error) {
         // Si hay un error, muestra un mensaje al usuario
         ScaffoldMessenger.of(context).showSnackBar(
@@ -86,12 +84,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Llama a la función signUp del AuthProvider
         authProvider.signIn(
+           context,
           _emailController.text.trim(),
           _passwordController.text.trim(),
         );
-
-        // Si el inicio de sesión es exitoso, navega a la ruta '/profile'
-        context.pop(); // Modificación aquí
       } catch (error) {
         // Si hay un error, muestra un mensaje al usuario
         ScaffoldMessenger.of(context).showSnackBar(

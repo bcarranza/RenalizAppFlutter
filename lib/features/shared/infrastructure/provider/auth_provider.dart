@@ -47,21 +47,55 @@ class AuthProvider extends ChangeNotifier {
   }
 
 //Crear cuenta com email and password Firebase
-  void signUp(String email, String password) async {
-    await _auth.createUserWithEmailAndPassword(
+  void signUp(BuildContext context, String email, String password) async {
+   final credential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-    notifyListeners();
+
+       final user = _auth.currentUser;
+        final AdditionalUserInfo? additionalUserInfo =
+            credential.additionalUserInfo;
+
+            if (user != null) {
+          // Verificar si el usuario es nuevo o no
+          if (additionalUserInfo?.isNewUser == true) {
+            // El usuario es nuevo, llévalo a la pantalla de registro de paciente
+            notifyListeners();
+            context.go(
+                '/test/patient-form'); // Cambia '/test/patient-form' por la ruta correcta del formulario de paciente
+          } else {
+            
+            // El usuario no es nuevo, llévalo a la pantalla de perfil
+            notifyListeners();
+            context.pop(); // Cambia '/profile' por la ruta correcta de perfil
+          }
+        }
   }
 
   //Iniciar sesion con correo y contraseña
-  void signIn(String email, String password) async {
-    await _auth.signInWithEmailAndPassword(
+  void signIn(BuildContext context, String email, String password) async {
+   final credential =  await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
-    notifyListeners();
+     final user = _auth.currentUser;
+        final AdditionalUserInfo? additionalUserInfo =
+            credential.additionalUserInfo;
+
+            if (user != null) {
+          // Verificar si el usuario es nuevo o no
+          if (additionalUserInfo?.isNewUser == true) {
+            // El usuario es nuevo, llévalo a la pantalla de registro de paciente
+            notifyListeners();
+            context.go(
+                '/test/patient-form'); // Cambia '/test/patient-form' por la ruta correcta del formulario de paciente
+          } else {
+            // El usuario no es nuevo, llévalo a la pantalla de perfil
+            notifyListeners();
+            context.pop(); // Cambia '/profile' por la ruta correcta de perfil
+          }
+        }
   }
 
   // Función para cerrar sesión
