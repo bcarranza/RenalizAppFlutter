@@ -54,16 +54,20 @@ class _MainListState extends State<MainList> {
   void filterData(String filtro) {
     setState(() {
       filtredBlogs = blogs.where((articulo) {
-        return articulo['title'].toLowerCase().contains(filtro.toLowerCase()) ||
-            articulo['category'].toLowerCase().contains(filtro.toLowerCase());
-        // articulo['tags']
-        //     .any((tag) => tag.toLowerCase().contains(filtro.toLowerCase()));
+        return (articulo['title'] as String)
+                .toLowerCase()
+                .contains(filtro.toLowerCase()) ||
+            (articulo['category'] as String)
+                .toLowerCase()
+                .contains(filtro.toLowerCase()) ||
+            (articulo['tags'] as List).every(
+                (tag) => tag.toLowerCase().contains(filtro.toLowerCase()));
       }).toList();
     });
   }
 
   _loadMoreBlogs() async {
-    Uri uri = Uri.parse(dotenv.env['API_URL']! + 'getAllBlogs');
+    Uri uri = Uri.parse('${dotenv.env['API_URL']!}getAllBlogs');
 
     final headers = {'Accept': 'application/json'};
 
@@ -94,7 +98,7 @@ class _MainListState extends State<MainList> {
     });
 
     return Scaffold(
-        endDrawer: FilterDrawer(),
+        endDrawer: const FilterDrawer(),
         body: FutureBuilder(
           future: _getBlogs(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
