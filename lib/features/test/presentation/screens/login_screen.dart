@@ -71,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Función para manejar el inicio de sesión
   void _signIn() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -79,17 +78,27 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        // Intenta registrarse con Firebase usando correo y contraseña
+        // Intenta iniciar sesión con Firebase usando correo y contraseña
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-        // Llama a la función signUp del AuthProvider
-        authProvider.signIn(
-           context,
+        // Llama a la función signIn del AuthProvider
+        final result = await authProvider.signIn(
+          context,
           _emailController.text.trim(),
           _passwordController.text.trim(),
         );
+
+        if (result == "Correo o contraseña incorrectos") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Correo o contraseña incorrectos')),
+          );
+        } else if (result == "El usuario no existe") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('El usuario no existe, debe registrarse')),
+          );
+        }
       } catch (error) {
-        // Si hay un error, muestra un mensaje al usuario
+        // Si hay otro error, muestra un mensaje genérico
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al iniciar sesión: $error')),
         );
@@ -106,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Iniciar Sesión / Registrarse'),
+        title: Text('Iniciar sesión / Registrarse'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         leading: IconButton(
@@ -156,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               child: _isLoading
                                   ? CircularProgressIndicator()
-                                  : Text('Iniciar Sesión'),
+                                  : Text('Iniciar sesión'),
                             ),
                           ),
                         ),
