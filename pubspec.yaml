@@ -38,6 +38,7 @@ dependencies:
   whatsapp: ^0.0.1
   url_launcher: ^6.1.14
   file_picker: ^4.1.6
+  
 
 
 dev_dependencies:
