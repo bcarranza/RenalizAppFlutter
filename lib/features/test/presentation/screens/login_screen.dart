@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  final GoRouter appRouter; // Agrega una propiedad para almacenar el enrutador
+  // Agrega una propiedad para almacenar el enrutador
 
-  LoginScreen({required this.appRouter});
+  LoginScreen({Key? key}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -54,12 +54,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Llama a la función signUp del AuthProvider
         authProvider.signUp(
+          context,
           _emailController.text.trim(),
           _passwordController.text.trim(),
         );
-
-        // Si el registro es exitoso, navega a la ruta '/profile'
-        widget.appRouter.go('/test/patient-form'); // Modificación aquí
       } catch (error) {
         // Si hay un error, muestra un mensaje al usuario
         ScaffoldMessenger.of(context).showSnackBar(
@@ -73,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Función para manejar el inicio de sesión
   void _signIn() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -81,19 +78,27 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        // Intenta registrarse con Firebase usando correo y contraseña
+        // Intenta iniciar sesión con Firebase usando correo y contraseña
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-        // Llama a la función signUp del AuthProvider
-        authProvider.signIn(
+        // Llama a la función signIn del AuthProvider
+        final result = await authProvider.signIn(
+          context,
           _emailController.text.trim(),
           _passwordController.text.trim(),
         );
 
-        // Si el inicio de sesión es exitoso, navega a la ruta '/profile'
-        widget.appRouter.go('/profile'); // Modificación aquí
+        if (result == "Correo o contraseña incorrectos") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Correo o contraseña incorrectos')),
+          );
+        } else if (result == "El usuario no existe") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('El usuario no existe, debe registrarse')),
+          );
+        }
       } catch (error) {
-        // Si hay un error, muestra un mensaje al usuario
+        // Si hay otro error, muestra un mensaje genérico
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al iniciar sesión: $error')),
         );
@@ -110,9 +115,13 @@ class _LoginScreenState extends State<LoginScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Iniciar Sesión / Registrarse'),
+        title: Text('Iniciar sesión / Registrarse'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -156,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               child: _isLoading
                                   ? CircularProgressIndicator()
-                                  : Text('Iniciar Sesión'),
+                                  : Text('Iniciar sesión'),
                             ),
                           ),
                         ),

@@ -11,24 +11,35 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
         final isUserLoggedIn = authProvider.currentUser != null;
 
         return AppBar(
-          leading: GestureDetector(
-            onTap: () {
-              GoRouter.of(context).go('/mentions');
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.asset(
-                'assets/renalizapp_icon_noText.png',
-                width: 32,
-                height: 32,
-              ),
-            ),
-          ),
+         leading: Tooltip(
+                    message: 'Ir a la página de menciones',
+                    child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            GoRouter.of(context).go('/mentions');
+                          }, 
+                          splashColor: const Color(0xFFCFE5FF),
+                          borderRadius: BorderRadius.circular(50),
+                          child: ClipOval(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.asset(
+                                'assets/renalizapp_icon_noText.png',
+                                width: 32,
+                                height: 32,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
           title: AnimatedDefaultTextStyle(
             duration: const Duration(seconds: 1),
             curve: Curves.easeInOut,
@@ -37,7 +48,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               fontSize: isUserLoggedIn ? 22 : 18,
               fontWeight: isUserLoggedIn ? FontWeight.bold : FontWeight.normal,
               fontStyle: isUserLoggedIn ? FontStyle.italic : FontStyle.normal,
-              color: isUserLoggedIn ? const Color(0xFF00629D) : Colors.black,
+              color: isUserLoggedIn ? const Color(0xFF00629D) : Theme.of(context).textTheme.labelMedium?.color ,
             ),
             child: const Text("RenalizApp"),
           ),
@@ -55,7 +66,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       key: const Key("profileIcon"),
                       icon: const Icon(Icons.person),
                       onPressed: () {
-                        GoRouter.of(context).go('/profile');
+                        GoRouter.of(context).push('/profile');
                       },
                     ),
                     IconButton(
@@ -63,7 +74,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       icon: const Icon(Icons.logout),
                       onPressed: () {
                         authProvider.signOut();
-                        Navigator.of(context).popUntil((route) => route.isFirst);
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
                       },
                     ),
                   ],
@@ -78,7 +90,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   key: const Key("loggedOutIcon"),
                   icon: const Icon(Icons.person_outlined),
                   onPressed: () {
-                    GoRouter.of(context).go('/profile');
+                    GoRouter.of(context).push('/profile');
                   },
                 ),
               ),

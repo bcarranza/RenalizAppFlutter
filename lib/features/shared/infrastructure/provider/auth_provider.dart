@@ -37,32 +37,72 @@ class AuthProvider extends ChangeNotifier {
           } else {
             // El usuario no es nuevo, llévalo a la pantalla de perfil
             notifyListeners();
-            context.go(
-                '/profile'); // Cambia '/profile' por la ruta correcta de perfil
+            context.pop(); // Cambia '/profile' por la ruta correcta de perfil
           }
         }
       }
-    } catch (error) {
-      print(error);
-    }
+    } catch (error) {}
   }
 
 //Crear cuenta com email and password Firebase
-  void signUp(String email, String password) async {
-    await _auth.createUserWithEmailAndPassword(
+  void signUp(BuildContext context, String email, String password) async {
+    final credential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-    notifyListeners();
+
+    final user = _auth.currentUser;
+    final AdditionalUserInfo? additionalUserInfo =
+        credential.additionalUserInfo;
+
+    if (user != null) {
+      // Verificar si el usuario es nuevo o no
+      if (additionalUserInfo?.isNewUser == true) {
+        // El usuario es nuevo, llévalo a la pantalla de registro de paciente
+        notifyListeners();
+        context.go(
+            '/test/patient-form'); // Cambia '/test/patient-form' por la ruta correcta del formulario de paciente
+      } else {
+        // El usuario no es nuevo, llévalo a la pantalla de perfil
+        notifyListeners();
+        context.pop(); // Cambia '/profile' por la ruta correcta de perfil
+      }
+    }
   }
 
   //Iniciar sesion con correo y contraseña
-  void signIn(String email, String password) async {
-    await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    notifyListeners();
+  Future<String> signIn(
+      BuildContext context, String email, String password) async {
+    try {
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final user = _auth.currentUser;
+      final AdditionalUserInfo? additionalUserInfo =
+          credential.additionalUserInfo;
+
+      if (user != null) {
+        // Verificar si el usuario es nuevo o no
+        if (additionalUserInfo?.isNewUser == true) {
+          // El usuario es nuevo, devuelve un mensaje que indique que se registró con éxito
+          notifyListeners();
+          context.go('/test/patient-form');
+          return "Registro exitoso";
+        } else {
+          // El usuario no es nuevo, devuelve un mensaje que indique que se inició sesión con éxito
+          notifyListeners();
+          context.pop();
+          return "Inicio de sesión exitoso";
+        }
+      } else {
+        // Si el usuario es nulo, indica un error desconocido
+        return "El usuario no existe, debe registrarse";
+      }
+    } catch (error) {
+      // Si hay un error, devuelve una cadena que describe el error
+      return "Correo o contraseña incorrectos";
+    }
   }
 
   // Función para cerrar sesión
@@ -76,8 +116,6 @@ class AuthProvider extends ChangeNotifier {
 
       // Notificar a los observadores que el usuario ha cerrado sesión
       notifyListeners();
-    } catch (error) {
-      print('Error al cerrar sesión: $error');
-    }
+    } catch (error) {}
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -20,7 +21,7 @@ class PlaceDetailScreen extends StatelessWidget {
         PlacesRepositoryImpl(PlacesDatasourceImpl());
 
     final isMobile = MediaQuery.of(context).size.width < 450;
-    Color mainColor = Theme.of(context).primaryColor;
+    Color mainColor = Theme.of(context).colorScheme.primary;
 
     return FutureBuilder<Place>(
       future: placesRepository.getPlaceById(uid!),
@@ -52,7 +53,7 @@ class PlaceDetailScreen extends StatelessWidget {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: NetworkImage(place.photoUrl),
+                        image: CachedNetworkImageProvider(place.photoUrl),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -67,7 +68,7 @@ class PlaceDetailScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: isMobile ? 18 : 24, 
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
+                            color: mainColor,
                           ),
                         ),
                         SizedBox(height: isMobile ? 8 : 16),
@@ -75,7 +76,7 @@ class PlaceDetailScreen extends StatelessWidget {
                           place.descripcion,
                           style: TextStyle(
                             fontSize: isMobile ? 16 : 18, 
-                            color: Colors.black87,
+                            color:  Theme.of(context).textTheme.labelMedium?.color,
                           ),
                         ),
                         SizedBox(height: isMobile ? 12 : 16), 

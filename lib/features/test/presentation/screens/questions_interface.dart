@@ -9,6 +9,8 @@ import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:renalizapp/features/shared/infrastructure/provider/auth_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+
 
 class Question {
   final String question;
@@ -94,6 +96,161 @@ class QuizzPage extends StatefulWidget {
 }
 
 class _QuizzPageState extends State<QuizzPage> {
+
+
+
+Future<void> _sendFeedback(String uid, bool? willVisitDoctor, int appRating, String comments) async {
+
+    final String? apiUrl = dotenv.env['API_URL'];
+
+    if (apiUrl == null) {
+      print("Error: No se pudo obtener la configuración de .env");
+      return;
+    }
+
+
+    final Uri uri = Uri.parse(apiUrl + 'postFeedback');
+    final response = await http.post(
+      uri,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'uid': uid,
+        'willVisitDoctor': willVisitDoctor,
+        'appRating': appRating,
+        'comments': comments,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Feedback sent successfully: ${response.body}');
+    } else {
+      print('Failed to send feedback: ${response.statusCode}');
+    }
+}
+
+Future<void> _showDoctorVisitDialog(double score, String riskMessage, String riskDescription) async {
+    final authProvider = context.read<AuthProvider>();  
+    String? uid = authProvider.currentUser?.uid;
+
+
+    if (uid != null) {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Puntuación: $score'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(riskMessage),
+                Text(riskDescription),
+                SizedBox(height: 20),
+                Text("¿Piensa ir al doctor después de ver los resultados de su test?"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showAppRatingDialog(uid, true);  // Muestra el siguiente diálogo para calificar la app
+
+                      },
+                      child: Text('Sí'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showAppRatingDialog(uid, false);  // Muestra el siguiente diálogo para calificar la app
+
+                      },
+                      child: Text('No'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
+    } else {
+      print("El usuario no ha iniciado sesión.");
+    }
+}
+Future<void> _showAppRatingDialog(String uid, bool willVisitDoctor) async {
+    double currentRating = 3.0;  // Valor inicial para mostrar
+    TextEditingController commentsController = TextEditingController();
+
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Califica nuestra aplicación'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RatingBar.builder(
+                    initialRating: currentRating,
+                    minRating: 1,
+                    direction: Axis.horizontal,
+                    allowHalfRating: true,
+                    itemCount: 5,
+                    itemSize: 30.0,
+                    itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                    ),
+                    onRatingUpdate: (rating) {
+                        currentRating = rating;
+                    },
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: commentsController,
+                  decoration: InputDecoration(
+                    labelText: 'Comentarios',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Saltar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _sendFeedback(uid, willVisitDoctor, -1, "NO COMMENTS");  // Usamos -1 para indicar que se saltó
+                },
+              ),
+              TextButton(
+                child: Text('Enviar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _sendFeedback(uid, willVisitDoctor, currentRating.toInt(), commentsController.text);
+                },
+              ),
+            ],
+          );
+        },
+      );
+}
+
+
+
+
+
+
+
+
+
+
+
+
   bool isZeroSelected = false;
   late Future<List<Question>> questionsFuture;
   int questionIndex = 0;
@@ -206,7 +363,8 @@ class _QuizzPageState extends State<QuizzPage> {
         }
         _postTestResult(response1, uid);
         _saveToHistory(riskMessage, riskDescription);
-        showRedirectDialog(context, score, riskMessage, riskDescription);
+        //showRedirectDialog(context, score, riskMessage, riskDescription);
+        _showDoctorVisitDialog(score, riskMessage, riskDescription);
       } else {
         if (score >= 0 && score <= 4) {
           riskMessage = "Buenas prácticas para la salud renal.";
@@ -222,8 +380,7 @@ class _QuizzPageState extends State<QuizzPage> {
         }
 
         _saveTestResult(response1);
-        _saveToHistory(
-            riskMessage, riskDescription); // Llamada al nuevo método aquí
+        _saveToHistory(riskMessage, riskDescription); // Llamada al nuevo método aquí
         showRedirectDialog(context, score, riskMessage, riskDescription);
       }
     }
@@ -346,6 +503,8 @@ class _QuizzPageState extends State<QuizzPage> {
     // print('Historial de tests guardados: $existingTestResults');
   }
 
+  final Map<int, int> selectedAnswers = {};
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -453,11 +612,10 @@ class _QuizzPageState extends State<QuizzPage> {
                             : RadioListTile<int>(
                                 title: Text(answer.text),
                                 value: answer.value,
-                                groupValue: questions[questionIndex]
-                                    .answers
-                                    .indexWhere((answer) => answer.isSelected),
+                               groupValue: selectedAnswers[questionIndex],
                                 onChanged: (int? value) {
                                   setState(() {
+                                    selectedAnswers[questionIndex] = value!;
                                     for (var ans
                                         in questions[questionIndex].answers) {
                                       ans.isSelected = ans.value == value;

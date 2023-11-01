@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>150217668394-8ifqtbq43c2sscemt3h3jn8e62f5gaup.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.150217668394-8ifqtbq43c2sscemt3h3jn8e62f5gaup</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>150217668394-eqsb8rofukteg52tt05sgva381h1a4sf.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAqrgyimEXPoys_Ec2iB0jhQeesz8_5D9M</string>
+	<key>GCM_SENDER_ID</key>
+	<string>150217668394</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>app.renalizapp.renalizapp.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>renalizapp-dev-2023-396503</string>
+	<key>STORAGE_BUCKET</key>
+	<string>renalizapp-dev-2023-396503.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:150217668394:ios:29569c2126407b21d41053</string>
+</dict>
+</plist>

@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:renalizapp/config/config.dart';
 import 'package:renalizapp/features/home/presentation/widgets/widgets.dart';
 
 class BlogDetail extends StatefulWidget {
@@ -17,28 +16,39 @@ class BlogDetail extends StatefulWidget {
 class _BlogDetailState extends State<BlogDetail> {
   @override
   Widget build(BuildContext context) {
+    Color mainColor = Theme.of(context).colorScheme.primary;
     List<Widget> images = [];
+    double txtScale = MediaQuery.of(context).textScaleFactor;
     blogDetail['images'].forEach((url) {
-      images.add(Image.network(url, fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-        return Container(
-          alignment: Alignment.center,
-          child: const Text(
-            'Error loading image!',
-            style: TextStyle(fontSize: 30),
+      images.add(Container(
+        width: MediaQuery.of(context).size.width,
+        child: Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.7,
+            child: Image.network(url, fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+              return Container(
+                alignment: Alignment.center,
+                child: const Text(
+                  'Error loading image!',
+                  style: TextStyle(fontSize: 30),
+                ),
+              );
+            }),
           ),
-        );
-      }));
+        ),
+      ));
       images.add(SizedBox(
         height: 8,
       ));
     });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           blogDetail["title"],
           style: TextStyle(
-              fontSize: 24.0,
+              fontSize: 30.0 * txtScale,
               fontWeight: FontWeight.bold,
               overflow: TextOverflow.ellipsis),
         ),
@@ -47,36 +57,39 @@ class _BlogDetailState extends State<BlogDetail> {
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
               "Fecha de Publicación: ${DateTime.fromMicrosecondsSinceEpoch(blogDetail['publication_date']["_seconds"] * 1000000).toLocal().toString().split('.')[0]}",
-              style: TextStyle(fontSize: 14.0, color: Colors.grey),
+              style: TextStyle(fontSize: 20.0 * txtScale, color: Colors.grey),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 16.0),
             Text(
-              blogDetail["description"],
-              textAlign: TextAlign.justify,
+              "Categoría: ${blogDetail["category"]}",
               style: TextStyle(
-                fontSize: 16.0,
+                  fontSize: 20.0 * txtScale, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 16.0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+              child: Text(
+                blogDetail["description"],
+                textAlign: TextAlign.justify,
+                style: TextStyle(fontSize: 24.0 * txtScale, height: 2),
               ),
             ),
             SizedBox(height: 16.0),
             ...images,
             Text(
               "Autor: ${blogDetail["author"]}",
-              style: TextStyle(fontSize: 16.0),
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              "Categoría: ${blogDetail["category"]}",
-              style: TextStyle(fontSize: 16.0),
+              style: TextStyle(fontSize: 16.0 * txtScale, color: Colors.grey),
             ),
             SizedBox(height: 16.0),
             Text(
               "Etiquetas:",
-              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 20.0 * txtScale, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8.0),
             blogDetail["tags"].isNotEmpty
@@ -95,7 +108,7 @@ class _BlogDetailState extends State<BlogDetail> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25.0),
                           ),
-                          backgroundColor: generateColor(tag),
+                          backgroundColor: generateColorWithOpacity(tag,mainColor,0.9),
                           labelStyle: TextStyle(
                             color: Colors.white,
                           ));
@@ -111,12 +124,18 @@ class _BlogDetailState extends State<BlogDetail> {
   }
 }
 
-Color generateColor(String text) {
+Color generateColorWithOpacity(String text, Color baseColor, double opacity) {
   final random = Random(text.hashCode);
-  return Color.fromRGBO(
-    random.nextInt(256),
-    random.nextInt(256),
-    random.nextInt(256),
-    1.0,
-  );
+
+  // Calcula un valor de diferencia aleatorio para R, G y B
+  final deltaR = random.nextInt(51) - 25; // Valor entre -25 y 25
+  final deltaG = random.nextInt(51) - 25;
+  final deltaB = random.nextInt(51) - 25;
+
+  // Aplica la diferencia al color base
+  final red = (baseColor.red + deltaR).clamp(0, 255);
+  final green = (baseColor.green + deltaG).clamp(0, 255);
+  final blue = (baseColor.blue + deltaB).clamp(0, 255);
+
+  return Color.fromRGBO(red, green, blue, opacity);
 }

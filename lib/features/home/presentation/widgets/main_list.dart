@@ -89,6 +89,9 @@ class _MainListState extends State<MainList> {
 
   @override
   Widget build(BuildContext context) {
+    Color mainColor = Theme.of(context).colorScheme.primary;
+    double txtScale = MediaQuery.of(context).textScaleFactor;
+
     _scrollController.addListener(() async {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
@@ -172,18 +175,24 @@ class _MainListState extends State<MainList> {
                                           backgroundImage: NetworkImage(
                                             blog['cover_image'],
                                           ),
+                                          radius: 40,
                                         ),
                                         title: Text(
                                           blog['title'],
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20.0 * txtScale),
                                         ),
                                         subtitle: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(blog['category']),
-                                            Text("Autor: ${blog['author']}"),
+                                            Text(blog['category'],
+                                                style: TextStyle(
+                                                    fontSize: 16.0 * txtScale)),
+                                            Text("Autor: ${blog['author']}",
+                                                style: TextStyle(
+                                                    fontSize: 16.0 * txtScale)),
                                             Text(DateTime
                                                     .fromMicrosecondsSinceEpoch(
                                                         blog['publication_date']
@@ -192,10 +201,10 @@ class _MainListState extends State<MainList> {
                                                 .toLocal()
                                                 .toString()
                                                 .split('.')[0]),
-                                            Text(
-                                              blog['description'],
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
+                                            Text(blog['description'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                    fontSize: 18.0 * txtScale)),
                                             displayedTags.isNotEmpty
                                                 ? SizedBox(height: 20)
                                                 : Container(),
@@ -210,7 +219,11 @@ class _MainListState extends State<MainList> {
                                                                 vertical: 0.0,
                                                                 horizontal:
                                                                     2.0), // Ajusta el padding según tus preferencias
-                                                        child: Text(tag),
+                                                        child: Text(
+                                                          tag,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
                                                       ),
                                                       shape:
                                                           RoundedRectangleBorder(
@@ -219,7 +232,10 @@ class _MainListState extends State<MainList> {
                                                                 .circular(25.0),
                                                       ),
                                                       backgroundColor:
-                                                          generateColor(tag),
+                                                          generateColorWithOpacity(
+                                                              tag,
+                                                              mainColor,
+                                                              0.9),
                                                       labelStyle: TextStyle(
                                                         color: Colors.white,
                                                       )))
@@ -234,18 +250,12 @@ class _MainListState extends State<MainList> {
                                                 : SizedBox()
                                           ],
                                         ),
-                                        trailing: IconButton(
-                                          icon: Icon(
-                                            Icons.star,
-                                            color: blog['isStarred']
-                                                ? Colors.yellow
-                                                : Colors
-                                                    .grey, // Color de la estrella según el valor de isEstrellado
-                                          ),
-                                          onPressed: () {
-                                            // Maneja la acción cuando se hace clic en la estrella aquí
-                                            // Puedes agregar lógica para cambiar el valor de isEstrellado
-                                          },
+                                        trailing: Icon(
+                                          Icons.star,
+                                          color: blog['isStarred']
+                                              ? Colors.yellow
+                                              : Colors
+                                                  .grey, // Color de la estrella según el valor de isEstrellado
                                         ),
                                       ),
                                     ));
@@ -264,12 +274,18 @@ class _MainListState extends State<MainList> {
   }
 }
 
-Color generateColor(String text) {
+Color generateColorWithOpacity(String text, Color baseColor, double opacity) {
   final random = Random(text.hashCode);
-  return Color.fromRGBO(
-    random.nextInt(256),
-    random.nextInt(256),
-    random.nextInt(256),
-    1.0,
-  );
+
+  // Calcula un valor de diferencia aleatorio para R, G y B
+  final deltaR = random.nextInt(51) - 25; // Valor entre -25 y 25
+  final deltaG = random.nextInt(51) - 25;
+  final deltaB = random.nextInt(51) - 25;
+
+  // Aplica la diferencia al color base
+  final red = (baseColor.red + deltaR).clamp(0, 255);
+  final green = (baseColor.green + deltaG).clamp(0, 255);
+  final blue = (baseColor.blue + deltaB).clamp(0, 255);
+
+  return Color.fromRGBO(red, green, blue, opacity);
 }
