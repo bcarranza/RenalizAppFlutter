@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:renalizapp/features/home/presentation/widgets/FilterDrawer.dart';
 import 'package:renalizapp/features/home/presentation/widgets/widgets.dart';
 
 class MainList extends StatefulWidget {
@@ -17,7 +16,6 @@ class MainList extends StatefulWidget {
 
 class _MainListState extends State<MainList> {
   ScrollController _scrollController = ScrollController();
-  TextEditingController _filter = TextEditingController();
   List blogs = [];
   List filtredBlogs = [];
   int perPage = 10;
@@ -137,230 +135,163 @@ class _MainListState extends State<MainList> {
     });
 
     return Scaffold(
-        endDrawer: Drawer(
-            width: MediaQuery.of(context).size.width * 0.55,
-            child: ListView(children: [
-              const DrawerHeader(
-                padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-                child: Center(
-                  child: Text(
-                    'Filtrar Por',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 35,
-                    ),
-                  ),
-                ),
-              ),
-              const Text("Autores",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 24,
-                  )),
-              const SizedBox(height: 15),
-              FutureBuilder(
-                future: _getAuthors(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                        child:
-                            CircularProgressIndicator()); // Muestra un indicador de carga mientras se obtienen los datos.
-                  }
-
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  }
-
-                  if (!snapshot.hasData) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-
-                  List authors = snapshot.data['authors'];
-
-                  return Column(
-                    children: authors.map((etiqueta) {
-                      return GestureDetector(
-                        onTap: () {
-                          filterData(etiqueta);
-                          context.pop();
-                        },
-                        child: Chip(
-                          label: Text(etiqueta),
-                          clipBehavior: Clip.antiAlias,
-                          backgroundColor: Colors.blue,
-                        ),
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-            ])),
         body: FutureBuilder(
-          future: _getBlogs(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting &&
-                !snapshot.hasData) {
-              return const CircularProgressIndicator();
-            }
+      future: _getBlogs(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
+          return const CircularProgressIndicator();
+        }
 
-            if (snapshot.hasData) {
-              return StatefulBuilder(
-                  builder: (context, setState) => Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    onChanged: (texto) {
-                                      filterData(texto);
-                                    },
-                                    decoration: const InputDecoration(
-                                      labelText: "Buscar",
-                                      hintText:
-                                          "Ingrese un término de búsqueda",
-                                      prefixIcon: Icon(Icons.search),
-                                    ),
-                                  ),
+        if (snapshot.hasData) {
+          return StatefulBuilder(
+              builder: (context, setState) => Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                onChanged: (texto) {
+                                  filterData(texto);
+                                },
+                                decoration: const InputDecoration(
+                                  labelText: "Buscar",
+                                  hintText: "Ingrese un término de búsqueda",
+                                  prefixIcon: Icon(Icons.search),
                                 ),
-                                ElevatedButton.icon(
-                                    icon: const Icon(Icons.filter_alt),
-                                    label: const Text("Filtro"),
-                                    onPressed: () {
-                                      Scaffold.of(context).openEndDrawer();
-                                    })
-                              ],
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: filtredBlogs.length,
-                              controller: _scrollController,
-                              itemBuilder: (context, index) {
-                                final blog = filtredBlogs[index] as Map;
-                                final tags = blog['tags'] as List;
-                                final displayedTags = tags.take(3).toList();
-                                final remainingTagsCount =
-                                    tags.length - displayedTags.length;
-                                final isTruncated = remainingTagsCount > 0;
+                            // ElevatedButton.icon(
+                            //     icon: const Icon(Icons.filter_alt),
+                            //     label: const Text("Filtro"),
+                            //     onPressed: () {
+                            //       Scaffold.of(context).openEndDrawer();
+                            //     })
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: filtredBlogs.length,
+                          controller: _scrollController,
+                          itemBuilder: (context, index) {
+                            final blog = filtredBlogs[index] as Map;
+                            final tags = blog['tags'] as List;
+                            final displayedTags = tags.take(3).toList();
+                            final remainingTagsCount =
+                                tags.length - displayedTags.length;
+                            final isTruncated = remainingTagsCount > 0;
 
-                                return GestureDetector(
-                                    onTap: () {
-                                      blogDetail = blog;
-                                      context.go('/blog-detail');
-                                    },
-                                    child: Card(
-                                      elevation:
-                                          2, // Puedes ajustar la elevación según tus preferencias
-                                      child: ListTile(
-                                        contentPadding: const EdgeInsets.all(
-                                            16), // Ajusta el relleno según tus necesidades
-                                        leading: CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                            blog['cover_image'],
-                                          ),
-                                          radius: 40,
-                                        ),
-                                        title: Text(
-                                          blog['title'],
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20.0 * txtScale),
-                                        ),
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(blog['category'],
-                                                style: TextStyle(
-                                                    fontSize: 16.0 * txtScale)),
-                                            Text("Autor: ${blog['author']}",
-                                                style: TextStyle(
-                                                    fontSize: 16.0 * txtScale)),
-                                            Text(DateTime
-                                                    .fromMicrosecondsSinceEpoch(
-                                                        blog['publication_date']
-                                                                ["_seconds"] *
-                                                            1000000)
+                            return GestureDetector(
+                                onTap: () {
+                                  blogDetail = blog;
+                                  context.go('/blog-detail');
+                                },
+                                child: Card(
+                                  elevation:
+                                      2, // Puedes ajustar la elevación según tus preferencias
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.all(
+                                        16), // Ajusta el relleno según tus necesidades
+                                    leading: CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        blog['cover_image'],
+                                      ),
+                                      radius: 40,
+                                    ),
+                                    title: Text(
+                                      blog['title'],
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20.0 * txtScale),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(blog['category'],
+                                            style: TextStyle(
+                                                fontSize: 16.0 * txtScale)),
+                                        Text("Autor: ${blog['author']}",
+                                            style: TextStyle(
+                                                fontSize: 16.0 * txtScale)),
+                                        Text(
+                                            DateTime.fromMicrosecondsSinceEpoch(
+                                                    blog['publication_date']
+                                                            ["_seconds"] *
+                                                        1000000)
                                                 .toLocal()
                                                 .toString()
                                                 .split('.')[0]),
-                                            Text(blog['description'],
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    fontSize: 18.0 * txtScale)),
-                                            displayedTags.isNotEmpty
-                                                ? const SizedBox(height: 20)
-                                                : Container(),
-                                            Wrap(
-                                              spacing: 6,
-                                              runSpacing: 6,
-                                              children: displayedTags
-                                                  .map((tag) => Chip(
-                                                      label: Padding(
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
-                                                            vertical: 0.0,
-                                                            horizontal:
-                                                                2.0), // Ajusta el padding según tus preferencias
-                                                        child: Text(
-                                                          tag,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(25.0),
-                                                      ),
-                                                      backgroundColor:
-                                                          generateColorWithOpacity(
-                                                              tag,
-                                                              mainColor,
-                                                              0.9),
-                                                      labelStyle:
-                                                          const TextStyle(
-                                                        color: Colors.white,
-                                                      )))
-                                                  .toList(),
-                                            ),
-                                            isTruncated
-                                                ? Text(
-                                                    "(+$remainingTagsCount más)",
-                                                    style: const TextStyle(
-                                                        color: Colors.blue),
-                                                  )
-                                                : const SizedBox()
-                                          ],
+                                        Text(blog['description'],
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontSize: 18.0 * txtScale)),
+                                        displayedTags.isNotEmpty
+                                            ? const SizedBox(height: 20)
+                                            : Container(),
+                                        Wrap(
+                                          spacing: 6,
+                                          runSpacing: 6,
+                                          children: displayedTags
+                                              .map((tag) => Chip(
+                                                  label: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 0.0,
+                                                        horizontal:
+                                                            2.0), // Ajusta el padding según tus preferencias
+                                                    child: Text(
+                                                      tag,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            25.0),
+                                                  ),
+                                                  backgroundColor:
+                                                      generateColorWithOpacity(
+                                                          tag, mainColor, 0.9),
+                                                  labelStyle: const TextStyle(
+                                                    color: Colors.white,
+                                                  )))
+                                              .toList(),
                                         ),
-                                        trailing: Icon(
-                                          Icons.star,
-                                          color: blog['isStarred']
-                                              ? Colors.yellow
-                                              : Colors
-                                                  .grey, // Color de la estrella según el valor de isEstrellado
-                                        ),
-                                      ),
-                                    ));
-                              },
-                            ),
-                          ),
-                        ],
-                      ));
-            }
+                                        isTruncated
+                                            ? Text(
+                                                "(+$remainingTagsCount más)",
+                                                style: const TextStyle(
+                                                    color: Colors.blue),
+                                              )
+                                            : const SizedBox()
+                                      ],
+                                    ),
+                                    trailing: Icon(
+                                      Icons.star,
+                                      color: blog['isStarred']
+                                          ? Colors.yellow
+                                          : Colors
+                                              .grey, // Color de la estrella según el valor de isEstrellado
+                                    ),
+                                  ),
+                                ));
+                          },
+                        ),
+                      ),
+                    ],
+                  ));
+        }
 
-            return const Center(
-              child: Text("Nothing to show..."),
-            );
-          },
-        ));
+        return const Center(
+          child: Text("Nothing to show..."),
+        );
+      },
+    ));
   }
 }
 
