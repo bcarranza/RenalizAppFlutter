@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:renalizapp/features/shared/widgets/navigation/appBar/custom_app_bar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../shared/infrastructure/provider/auth_provider.dart';
 

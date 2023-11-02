@@ -47,9 +47,11 @@ class AuthProvider extends ChangeNotifier {
 //Crear cuenta com email and password Firebase
   void signUp(BuildContext context, String email, String password) async {
     final credential = await _auth.createUserWithEmailAndPassword(
+
       email: email,
       password: password,
     );
+
 
     final user = _auth.currentUser;
     final AdditionalUserInfo? additionalUserInfo =
@@ -103,6 +105,7 @@ class AuthProvider extends ChangeNotifier {
       // Si hay un error, devuelve una cadena que describe el error
       return "Correo o contraseña incorrectos";
     }
+
   }
 
   // Función para cerrar sesión

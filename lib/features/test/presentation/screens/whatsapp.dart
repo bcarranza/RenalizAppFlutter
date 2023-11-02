@@ -9,6 +9,7 @@ import 'package:renalizapp/features/shared/widgets/navigation/appBar/custom_app_
 class WhatsAppScreen extends StatelessWidget {
   const WhatsAppScreen({Key? key});
 
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);

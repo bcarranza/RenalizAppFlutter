@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:url_launcher/url_launcher.dart';
+
 
 import '../../providers/theme_notifier.dart';
 
@@ -40,10 +42,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
            ListTile(
             title: const Text('Número de Versión'),
             subtitle: const Text('v.1.0'),
+
             onTap: () {
              
             },
           ),
+
           ListTile(
             title: const Text('Terminos y condiciones de uso'),
             subtitle: const Text('Presiona aqui para ver los terminos de nuestra aplicación.'),
@@ -52,6 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               launch(url);
             },
           ),
+
          
         ],
       ),

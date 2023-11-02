@@ -86,6 +86,7 @@ class _MainListState extends State<MainList> {
   Widget build(BuildContext context) {
     Color mainColor = Theme.of(context).colorScheme.primary;
     Color secondaryColor = Theme.of(context).colorScheme.secondary;
+
     double txtScale = MediaQuery.of(context).textScaleFactor;
 
     _scrollController.addListener(() async {
@@ -208,7 +209,9 @@ class _MainListState extends State<MainList> {
                                                             25.0),
                                                   ),
                                                   backgroundColor:
+
                                                       generateColorWithOpacity(tag, mainColor,secondaryColor,0.7),
+
                                                   labelStyle: TextStyle(
                                                     color: Colors.white,
                                                   )))
@@ -247,6 +250,7 @@ class _MainListState extends State<MainList> {
   }
 }
 
+
 Color generateColorWithOpacity(String text, Color baseColor1, Color baseColor2, double opacity) {
   final random = Random(text.hashCode);
   const delta = 30; // Ajusta el valor para controlar la variación de color
@@ -272,3 +276,4 @@ Color generateColorWithOpacity(String text, Color baseColor1, Color baseColor2, 
 
   return Color.fromRGBO(deltaR, deltaG, deltaB, opacity);
 }
+
