@@ -49,10 +49,13 @@ dev_dependencies:
 flutter_native_splash:
   color: "#FFFFFF"
   image: assets/renalizapp_icon_noText.png
+  branding: assets/umg.png
+  branding_mode: bottom
 
 flutter:
   assets:
     - assets/renalizapp_icon.png
     - assets/renalizapp_icon_noText.png
+    - assets/umg.png
     - .env
   uses-material-design: true
