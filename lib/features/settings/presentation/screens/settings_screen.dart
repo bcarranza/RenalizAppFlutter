@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
+
 import '../../providers/theme_notifier.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -38,11 +41,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
            ListTile(
             title: const Text('Número de Versión'),
-            subtitle: const Text('Versión 0.5 Open Beta'),
+            subtitle: const Text('v.1.0'),
+
             onTap: () {
              
             },
           ),
+
+          ListTile(
+            title: const Text('Terminos y condiciones de uso'),
+            subtitle: const Text('Presiona aqui para ver los terminos de nuestra aplicación.'),
+            onTap: () {
+              const url = 'https://docs.google.com/document/d/1TpnPiCPdDabXOpsBQQtz0raNPYWau-Q0oI8GM7r9byQ/edit?usp=sharing';
+              launch(url);
+            },
+          ),
+
          
         ],
       ),

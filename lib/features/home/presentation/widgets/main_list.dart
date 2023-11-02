@@ -85,6 +85,8 @@ class _MainListState extends State<MainList> {
   @override
   Widget build(BuildContext context) {
     Color mainColor = Theme.of(context).colorScheme.primary;
+    Color secondaryColor = Theme.of(context).colorScheme.secondary;
+
     double txtScale = MediaQuery.of(context).textScaleFactor;
 
     _scrollController.addListener(() async {
@@ -207,7 +209,9 @@ class _MainListState extends State<MainList> {
                                                             25.0),
                                                   ),
                                                   backgroundColor:
-                                                      generateColorWithOpacity(tag, mainColor,0.9),
+
+                                                      generateColorWithOpacity(tag, mainColor,secondaryColor,0.7),
+
                                                   labelStyle: TextStyle(
                                                     color: Colors.white,
                                                   )))
@@ -246,18 +250,30 @@ class _MainListState extends State<MainList> {
   }
 }
 
-Color generateColorWithOpacity(String text, Color baseColor, double opacity) {
+
+Color generateColorWithOpacity(String text, Color baseColor1, Color baseColor2, double opacity) {
   final random = Random(text.hashCode);
+  const delta = 30; // Ajusta el valor para controlar la variación de color
 
-  // Calcula un valor de diferencia aleatorio para R, G y B
-  final deltaR = random.nextInt(51) - 25; // Valor entre -25 y 25
-  final deltaG = random.nextInt(51) - 25;
-  final deltaB = random.nextInt(51) - 25;
+  // Componentes RGB de las dos bases de color
+  int baseRed1 = baseColor1.red;
+  int baseGreen1 = baseColor1.green;
+  int baseBlue1 = baseColor1.blue;
 
-  // Aplica la diferencia al color base
-  final red = (baseColor.red + deltaR).clamp(0, 255);
-  final green = (baseColor.green + deltaG).clamp(0, 255);
-  final blue = (baseColor.blue + deltaB).clamp(0, 255);
+  int baseRed2 = baseColor2.red;
+  int baseGreen2 = baseColor2.green;
+  int baseBlue2 = baseColor2.blue;
 
-  return Color.fromRGBO(red, green, blue, opacity);
+  // Alternar entre las dos bases de color
+  Color selectedBaseColor = random.nextBool()
+      ? baseColor1
+      : baseColor2;
+
+  // Generar variaciones aleatorias desde el color base seleccionado
+  int deltaR = (selectedBaseColor.red + random.nextInt(delta * 2) - delta).clamp(0, 255);
+  int deltaG = (selectedBaseColor.green + random.nextInt(delta * 2) - delta).clamp(0, 255);
+  int deltaB = (selectedBaseColor.blue + random.nextInt(delta * 2) - delta).clamp(0, 255);
+
+  return Color.fromRGBO(deltaR, deltaG, deltaB, opacity);
 }
+

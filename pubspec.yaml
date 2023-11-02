@@ -38,6 +38,7 @@ dependencies:
   whatsapp: ^0.0.1
   url_launcher: ^6.1.14
   file_picker: ^4.1.6
+  
 
 
 dev_dependencies:
@@ -48,10 +49,13 @@ dev_dependencies:
 flutter_native_splash:
   color: "#FFFFFF"
   image: assets/renalizapp_icon_noText.png
+  branding: assets/umg.png
+  branding_mode: bottom
 
 flutter:
   assets:
     - assets/renalizapp_icon.png
     - assets/renalizapp_icon_noText.png
+    - assets/umg.png
     - .env
   uses-material-design: true

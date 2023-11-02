@@ -28,6 +28,7 @@ class Empleado {
 }
 
 class _EquipoPageState extends State<EquipoPage> {
+  final CarouselController _carouselController = CarouselController();
   List<Empleado> empleados = [];
 
   _EquipoPageState() {
@@ -123,6 +124,7 @@ class _EquipoPageState extends State<EquipoPage> {
           children: [
             SizedBox(height: 25),
             CarouselSlider(
+              carouselController: _carouselController,
               items: empleados.map((empleado) {
                 return _buildEmpleadoCard(empleado);
               }).toList(),
@@ -137,6 +139,51 @@ class _EquipoPageState extends State<EquipoPage> {
                 },
               ),
             ),
+            SizedBox(height: 25),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue, // Color de fondo del botón
+                    foregroundColor: Colors.white, // Color de texto del botón
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Borde redondeado
+                    ),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10), // Espaciado del botón
+                  ),
+                  onPressed: () {
+                    _carouselController.previousPage();
+                  },
+                  child: Text(
+                    '<',
+                    style: TextStyle(fontSize: 35), // Tamaño del texto
+                  ),
+                ),
+                SizedBox(width: 16),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue, // Color de fondo del botón
+                    foregroundColor: Colors.white, // Color de texto del botón
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Borde redondeado
+                    ),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10), // Espaciado del botón
+                  ),
+                  onPressed: () {
+                    _carouselController.nextPage();
+                  },
+                  child: Text(
+                    '>',
+                    style: TextStyle(fontSize: 35), // Tamaño del texto
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),
