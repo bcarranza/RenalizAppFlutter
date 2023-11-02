@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:renalizapp/features/shared/widgets/navigation/appBar/custom_app_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../shared/infrastructure/provider/auth_provider.dart';
 
@@ -9,6 +10,41 @@ class TestScreen extends StatelessWidget {
   const TestScreen({required this.subPath, Key? key}) : super(key: key);
 
   final String subPath;
+   final String dialogPrefKey = 'termsDialogShown'; 
+   final String dialogPrefUserKey = 'termsUserDialogShown'; 
+
+
+  Future<void> _showTermsDialog(BuildContext context, String  title, String  textDialog ,  String path , String key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool dialogShown = prefs.getBool(key) ?? false;
+
+    if (!dialogShown) {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title:  Text(title),
+            content:  SingleChildScrollView(
+              child: Text(textDialog),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Aceptar'),
+                onPressed: () {
+                  prefs.setBool(dialogPrefKey, true);
+                  Navigator.of(context).pop();
+                  context.go(path);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      context.go('/test/quizz');
+    }
+  }
+   
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +62,13 @@ class TestScreen extends StatelessWidget {
             authProvider.currentUser != null
                 ? ElevatedButton(
                     onPressed: () {
-                      // context.go(subPath);
-                      context.go('/test/quizz');
+                    _showTermsDialog(
+                      context,
+                      "Términos de privacidad",
+                      "Toda la información que será recolectada tendrá uso únicamente informativo a las entidades médicas de Jalapa. En ningún momento RenalizApp guardará la información personal para otros fines y toda información solicitada es únicamente para poder dar un diagnóstico aún más preciso.",
+                      "/test/quizz",
+                      dialogPrefKey
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
@@ -47,7 +88,13 @@ class TestScreen extends StatelessWidget {
             authProvider.currentUser == null
                 ? ElevatedButton(
                     onPressed: () {
-                      context.push('/login');
+                      _showTermsDialog(
+                      context,
+                      "Términos de privacidad para cuentas",
+                      "Toda la información que será recolectada tendrá uso únicamente informativo a las entidades médicas de Jalapa. En ningún momento RenalizApp guardará la información personal para otros fines y toda información solicitada es únicamente para poder dar un diagnóstico aún más preciso.",
+                      "/login",
+                      dialogPrefUserKey
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       padding:
