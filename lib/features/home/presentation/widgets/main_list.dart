@@ -24,8 +24,42 @@ class _MainListState extends State<MainList> {
   int page = 1;
   int allItems = 0;
   bool loading = false;
+  var authors = [];
+  var tags = [];
 
 // Fetch Data
+
+  Future _getAuthors() async {
+    Uri uri = Uri.parse(dotenv.env['API_URL']! + 'getAuthor');
+
+    final headers = {'Accept': 'application/json'};
+
+    final body = {"perPage": perPage.toString(), "page": page.toString()};
+
+    final response = await http.post(uri, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      return {'authors': jsonDecode(response.body), 'tags': _getTags()};
+    } else {
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
+
+  Future _getTags() async {
+    Uri uri = Uri.parse(dotenv.env['API_URL']! + 'getTag');
+
+    final headers = {'Accept': 'application/json'};
+
+    final body = {"perPage": perPage.toString(), "page": page.toString()};
+
+    final response = await http.post(uri, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Error: ${response.statusCode}');
+    }
+  }
 
   Future _getBlogs() async {
     if (blogs.isNotEmpty) {
@@ -60,8 +94,10 @@ class _MainListState extends State<MainList> {
             (articulo['category'] as String)
                 .toLowerCase()
                 .contains(filtro.toLowerCase()) ||
-            (articulo['tags'] as List).every(
-                (tag) => tag.toLowerCase().contains(filtro.toLowerCase()));
+            (articulo['tags'] as List).any((tag) => tag
+                .toString()
+                .toLowerCase()
+                .contains(filtro.toLowerCase().trim()));
       }).toList();
     });
   }
@@ -101,7 +137,68 @@ class _MainListState extends State<MainList> {
     });
 
     return Scaffold(
-        endDrawer: const FilterDrawer(),
+        endDrawer: Drawer(
+            width: MediaQuery.of(context).size.width * 0.55,
+            child: ListView(children: [
+              const DrawerHeader(
+                padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
+                child: Center(
+                  child: Text(
+                    'Filtrar Por',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 35,
+                    ),
+                  ),
+                ),
+              ),
+              const Text("Autores",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 24,
+                  )),
+              const SizedBox(height: 15),
+              FutureBuilder(
+                future: _getAuthors(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child:
+                            CircularProgressIndicator()); // Muestra un indicador de carga mientras se obtienen los datos.
+                  }
+
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  }
+
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  List authors = snapshot.data['authors'];
+
+                  return Column(
+                    children: authors.map((etiqueta) {
+                      return GestureDetector(
+                        onTap: () {
+                          filterData(etiqueta);
+                          context.pop();
+                        },
+                        child: Chip(
+                          label: Text(etiqueta),
+                          clipBehavior: Clip.antiAlias,
+                          backgroundColor: Colors.blue,
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+            ])),
         body: FutureBuilder(
           future: _getBlogs(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -111,15 +208,6 @@ class _MainListState extends State<MainList> {
             }
 
             if (snapshot.hasData) {
-              // List mapBlogs = blogs.map((e) {
-              //   e['publication_date'] = Map.from(e['publication_date']);
-
-              //   return Map.from(e);
-              // }).toList();
-
-              // mapBlogs.sort((a, b) => b['publication_date']['_seconds']
-              //     .compareTo(a['publication_date']['_seconds']));
-
               return StatefulBuilder(
                   builder: (context, setState) => Column(
                         children: [
@@ -132,7 +220,7 @@ class _MainListState extends State<MainList> {
                                     onChanged: (texto) {
                                       filterData(texto);
                                     },
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       labelText: "Buscar",
                                       hintText:
                                           "Ingrese un término de búsqueda",
@@ -141,10 +229,11 @@ class _MainListState extends State<MainList> {
                                   ),
                                 ),
                                 ElevatedButton.icon(
-                                    onPressed: () =>
-                                        Scaffold.of(context).openEndDrawer(),
-                                    icon: Icon(Icons.filter_alt),
-                                    label: Text("Filtrar"))
+                                    icon: const Icon(Icons.filter_alt),
+                                    label: const Text("Filtro"),
+                                    onPressed: () {
+                                      Scaffold.of(context).openEndDrawer();
+                                    })
                               ],
                             ),
                           ),
@@ -206,7 +295,7 @@ class _MainListState extends State<MainList> {
                                                 style: TextStyle(
                                                     fontSize: 18.0 * txtScale)),
                                             displayedTags.isNotEmpty
-                                                ? SizedBox(height: 20)
+                                                ? const SizedBox(height: 20)
                                                 : Container(),
                                             Wrap(
                                               spacing: 6,
@@ -214,11 +303,11 @@ class _MainListState extends State<MainList> {
                                               children: displayedTags
                                                   .map((tag) => Chip(
                                                       label: Padding(
-                                                        padding: EdgeInsets
+                                                        padding: const EdgeInsets
                                                             .symmetric(
-                                                                vertical: 0.0,
-                                                                horizontal:
-                                                                    2.0), // Ajusta el padding según tus preferencias
+                                                            vertical: 0.0,
+                                                            horizontal:
+                                                                2.0), // Ajusta el padding según tus preferencias
                                                         child: Text(
                                                           tag,
                                                           overflow: TextOverflow
@@ -236,7 +325,8 @@ class _MainListState extends State<MainList> {
                                                               tag,
                                                               mainColor,
                                                               0.9),
-                                                      labelStyle: TextStyle(
+                                                      labelStyle:
+                                                          const TextStyle(
                                                         color: Colors.white,
                                                       )))
                                                   .toList(),
@@ -244,10 +334,10 @@ class _MainListState extends State<MainList> {
                                             isTruncated
                                                 ? Text(
                                                     "(+$remainingTagsCount más)",
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         color: Colors.blue),
                                                   )
-                                                : SizedBox()
+                                                : const SizedBox()
                                           ],
                                         ),
                                         trailing: Icon(
@@ -266,7 +356,7 @@ class _MainListState extends State<MainList> {
                       ));
             }
 
-            return Center(
+            return const Center(
               child: Text("Nothing to show..."),
             );
           },
